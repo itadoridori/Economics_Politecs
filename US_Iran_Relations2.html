@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPAインフォグラフィック：米イラン関係と日本の危機</title>
+    <!-- Chosen Palette: Geopolitical Calm (Warm Neutrals with Muted Accents) -->
+    <!-- Application Structure Plan: A top-down narrative structure is used to guide the user through the complex geopolitical issue. It starts with the immediate conflict (The Boiling Point), provides historical context (Echoes of Failure), details the severe consequences (The Domino Effect), analyzes the specific stakeholder's position (Japan's Dilemma), and concludes with the overarching strategic lesson (The Realist's Calculus). This thematic, scrolling flow is chosen over a rigid report structure to enhance storytelling and user understanding of the causal links between different geopolitical factors. -->
+    <!-- Visualization & Content Choices: 
+        1. US Demands Shift: Goal: Compare. Method: Side-by-side HTML/CSS cards. Justification: Direct comparison is clearest for showing policy change.
+        2. Trump Admin Factions: Goal: Show Proportions. Method: Chart.js Donut Chart. Justification: Best for showing a simple part-to-whole relationship of the internal power dynamic.
+        3. Failed Interventions Timeline: Goal: Show Change over time. Method: HTML/CSS horizontal timeline. Justification: Effectively displays a sequence of historical events to establish a pattern.
+        4. Geopolitical Domino Effect: Goal: Show Process/Flow. Method: HTML/CSS flowchart. Justification: Crucial for visually explaining the chain reaction of consequences, which is a core argument of the report.
+        5. Japan's Strategy & Media: Goal: Inform/Show Relationship. Method: Styled HTML info boxes and a simple HTML/CSS diagram. Justification: Qualitative points best conveyed through strong visual metaphors (iconography).
+        6. Balance of Power Analysis: Goal: Compare. Method: Two side-by-side Chart.js Bar Charts. Justification: Ideal for comparing the relative power of different blocs under "ideal" vs. "real" scenarios, visually demonstrating the strategic failure.
+        All visualizations are interactive on hover where applicable. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 320px;
+            }
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            line-height: 1;
+            color: #4a5568; /* slate-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <header class="text-center my-12">
+            <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-3">イラン・ギャンビット</h1>
+            <p class="text-xl md:text-2xl font-bold text-[#E57373]">米国の迷走と日本の危機</p>
+        </header>
+
+        <main class="space-y-16">
+
+            <section id="boiling-point">
+                <h2 class="text-3xl font-bold text-gray-900 text-center mb-2">1. 沸点：揺らぐ米国の対イラン政策</h2>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">米国の対イラン核交渉における方針は、一貫性を欠き、危険なほど強硬化しています。その背景には、政権内部の深刻な対立が存在します。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-4 text-center">要求の変化</h3>
+                        <div class="space-y-4">
+                            <div class="border-2 border-blue-300 rounded-lg p-4">
+                                <h4 class="font-bold text-blue-800">数週間前の提案 (融和)</h4>
+                                <p class="flex items-center mt-2"><span class="text-2xl mr-3">🤝</span><span>限定的なウラン濃縮を容認し、制裁解除の可能性を示唆。</span></p>
+                            </div>
+                            <div class="border-2 border-red-400 rounded-lg p-4">
+                                <h4 class="font-bold text-red-800">現在の要求 (強硬)</h4>
+                                <p class="flex items-center mt-2"><span class="text-2xl mr-3">💥</span><span>全ての核開発能力の完全放棄と、既存備蓄の全面的な引き渡し。</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-4 text-center">政権内の勢力図 (推定)</h3>
+                        <div class="chart-container">
+                            <canvas id="factionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="retrospective">
+                <h2 class="text-3xl font-bold text-gray-900 text-center mb-2">2. 失敗の残響：米国・30年間の軍事介入</h2>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">専門家の分析によれば、過去30年間の米国の軍事介入は、国力を浪費しただけで明確な成功を収めていません。この歴史が、現在の対外政策の背景に影を落としています。</p>
+                <div class="w-full bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center text-center">
+                        <div class="flex-1">
+                            <p class="font-bold text-lg">イラク戦争</p>
+                            <p class="text-4xl text-red-500 my-2">❌</p>
+                            <p class="text-sm text-gray-500">2003-</p>
+                        </div>
+                        <div class="flex-1 border-t-4 border-gray-300 -mt-8"></div>
+                        <div class="flex-1">
+                            <p class="font-bold text-lg">アフガニスタン</p>
+                            <p class="text-4xl text-red-500 my-2">❌</p>
+                            <p class="text-sm text-gray-500">2001-2021</p>
+                        </div>
+                        <div class="flex-1 border-t-4 border-gray-300 -mt-8"></div>
+                        <div class="flex-1">
+                             <p class="font-bold text-lg">ウクライナ戦争</p>
+                            <p class="text-4xl text-yellow-500 my-2">❓</p>
+                            <p class="text-sm text-gray-500">2022- (泥沼化)</p>
+                        </div>
+                    </div>
+                    <p class="text-center mt-4 text-gray-600 font-semibold">ほとんどの介入が、当初の目的を達成できず失敗に終わる。</p>
+                </div>
+            </section>
+
+            <section id="domino-effect">
+                <h2 class="text-3xl font-bold text-gray-900 text-center mb-2">3. ドミノ効果：戦争が招く日本の危機</h2>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">もし米イラン戦争が勃発すれば、その影響は中東に留まりません。米国のリソースが中東に集中することで生じる「力の空白」は、中国に好機を与え、日本の安全保障を根底から揺るがします。</p>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                     <div class="flex flex-col md:flex-row items-center justify-around space-y-4 md:space-y-0 text-center">
+                        <div class="p-4 rounded-lg bg-red-100 w-full md:w-auto">
+                            <p class="text-3xl mb-1">⚔️</p>
+                            <p class="font-bold">米イラン戦争<br>勃発</p>
+                        </div>
+                        <div class="flow-arrow transform md:rotate-0 rotate-90">➡️</div>
+                        <div class="p-4 rounded-lg bg-gray-200 w-full md:w-auto">
+                            <p class="text-3xl mb-1">🌏</p>
+                            <p class="font-bold">米軍、東アジアから<br>中東へ</p>
+                        </div>
+                        <div class="flow-arrow transform md:rotate-0 rotate-90">➡️</div>
+                        <div class="p-4 rounded-lg bg-gray-200 w-full md:w-auto">
+                            <p class="text-3xl mb-1">🐉</p>
+                            <p class="font-bold">中国が台湾へ<br>圧力を強化</p>
+                        </div>
+                        <div class="flow-arrow transform md:rotate-0 rotate-90">➡️</div>
+                        <div class="p-4 rounded-lg bg-red-100 w-full md:w-auto">
+                            <p class="text-3xl mb-1">🇯🇵</p>
+                            <p class="font-bold text-red-800">日本の孤立<br>安全保障の崩壊</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="japan-dilemma">
+                <h2 class="text-3xl font-bold text-gray-900 text-center mb-2">4. 戦略的死角：日本のジレンマ</h2>
+                <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">日本の国益は米イランの戦争回避にあるにも関わらず、国内の外交・安全保障戦略は長期的な視点を欠き、一部言論は国益に反する主張を繰り返しています。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-4 text-center">欠如したグランドストラテジー</h3>
+                        <div class="flex flex-col items-center justify-center h-full text-center bg-amber-100 p-4 rounded-lg border-2 border-amber-300">
+                             <p class="text-4xl mb-2">🙏</p>
+                             <p class="font-bold text-gray-700">「米国が守ってくれる」という対米依存から脱却できず、自律的な国家戦略を描けていない。</p>
+                        </div>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-4 text-center">思考停止した国内言論</h3>
+                        <div class="flex items-center justify-center h-full text-center bg-gray-200 p-4 rounded-lg">
+                            <div class="text-center">
+                                <p class="text-3xl">🗣️</p>
+                                <p class="font-bold">米ネオコン</p>
+                            </div>
+                            <div class="mx-4 text-3xl font-bold text-[#E57373]">»</div>
+                             <p class="text-lg font-bold">主張を模倣</p>
+                            <div class="mx-4 text-3xl font-bold text-[#E57373]">»</div>
+                            <div class="text-center">
+                                 <p class="text-3xl">🦜</p>
+                                 <p class="font-bold">日本の保守言論</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="realism-calculus">
+                 <h2 class="text-3xl font-bold text-gray-900 text-center mb-2">5. リアリストの計算：力の均衡の崩壊</h2>
+                 <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">国際政治における真のリアリズムとは、国益のために力の均衡（バランス・オブ・パワー）を維持することです。現在のアメリカの政策は、この原則に反し、自らを不利な状況に追い込んでいます。</p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-4 text-center">理想的なバランス戦略</h3>
+                        <div class="chart-container">
+                            <canvas id="idealBalanceChart"></canvas>
+                        </div>
+                         <p class="text-center text-sm text-gray-600 mt-2">No.2の中国に対抗するため、No.3のロシアと連携し、中国を孤立させる。</p>
+                    </div>
+                     <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="font-bold text-xl mb-4 text-center">現在の失敗した戦略</h3>
+                        <div class="chart-container">
+                            <canvas id="currentBalanceChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-gray-600 mt-2">ロシアも敵に回し、結果的に中露を結束させ、自らが孤立する。</p>
+                    </div>
+                 </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const palette = {
+            danger: '#E57373', // Muted Red
+            accent: '#64B5F6', // Muted Blue
+            neutral: '#90A4AE', // Slate Gray
+            dark: '#263238', // Dark Slate
+            warning: '#FFB74D' // Muted Orange
+        };
+
+        const wrapLabel = (str, maxWidth) => {
+            if (!str) return '';
+            if (str.length <= maxWidth) {
+                return str;
+            }
+            const words = str.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > maxWidth && currentLine.length > 0) {
+                    lines.push(currentLine.trim());
+                    currentLine = '';
+                }
+                currentLine += word + ' ';
+            }
+            if (currentLine.trim().length > 0) {
+                lines.push(currentLine.trim());
+            }
+            return lines.length > 0 ? lines : [str];
+        };
+        
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            }
+            return label || '';
+        };
+
+        const defaultChartOptions = (legendDisplay = true) => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: legendDisplay,
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback,
+                    }
+                }
+            }
+        });
+
+        const factionCtx = document.getElementById('factionChart');
+        if (factionCtx) {
+            new Chart(factionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['強硬派 (ネオコンなど)', '慎重派 (現実主義者)'],
+                    datasets: [{
+                        data: [75, 25],
+                        backgroundColor: [palette.danger, palette.accent],
+                        borderColor: '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: defaultChartOptions()
+            });
+        }
+        
+        const idealBalanceCtx = document.getElementById('idealBalanceChart');
+        if (idealBalanceCtx) {
+            new Chart(idealBalanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['米国・ロシア連合', '中国'],
+                    datasets: [{
+                        label: '国力指数',
+                        data: [110, 85],
+                        backgroundColor: [palette.accent, palette.danger],
+                    }]
+                },
+                options: {
+                    ...defaultChartOptions(false),
+                    indexAxis: 'y'
+                }
+            });
+        }
+
+        const currentBalanceCtx = document.getElementById('currentBalanceChart');
+        if (currentBalanceCtx) {
+            new Chart(currentBalanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['米国', '中国・ロシア連合'],
+                    datasets: [{
+                        label: '国力指数',
+                        data: [100, 120],
+                        backgroundColor: [palette.accent, palette.danger],
+                    }]
+                },
+                options: {
+                    ...defaultChartOptions(false),
+                    indexAxis: 'y'
+                }
+            });
+        }
+    </script>
+</body>
+</html>

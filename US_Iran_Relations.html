@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インフォグラフィック：揺れる米イラン関係と日本の危機</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            line-height: 1;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-slate-900 mb-2">揺れる米国外交</h1>
+            <p class="text-xl md:text-2xl font-bold text-[#FF5733]">イラン問題が映し出す日本の危機</p>
+        </header>
+
+        <main class="space-y-12">
+
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">1. 迷走する対イラン政策</h2>
+                <p class="mb-6">米国の対イラン核交渉における要求はここ数週間で劇的に変化し、強硬化しています。この態度の変化が、両国関係を戦争の瀬戸際へと追い込んでいます。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+                    <div class="border-2 border-green-400 rounded-lg p-4">
+                        <h3 class="text-lg font-bold mb-2">数週間前の提案 (融和的)</h3>
+                        <p class="text-4xl mb-2">🤝</p>
+                        <p>限定的なウラン濃縮を容認し、制裁解除と協定締結を示唆。</p>
+                    </div>
+                    <div class="border-2 border-red-500 rounded-lg p-4">
+                        <h3 class="text-lg font-bold mb-2">現在の要求 (強硬的)</h3>
+                         <p class="text-4xl mb-2">💥</p>
+                        <p>全ての核開発能力の完全放棄と、既存の蓄積の全面的な引き渡しを要求。</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">2. 失敗の30年：米国の軍事介入史</h2>
+                <p class="mb-6">専門家の分析によれば、過去30年間の米国の軍事介入は、国力を浪費しただけで明確な成功を収めていません。この歴史が現在の慎重論の背景にあります。</p>
+                <div class="flex items-center justify-center space-x-4 md:space-x-8">
+                     <div class="text-center">
+                        <p class="text-6xl font-black text-[#FF5733]">30</p>
+                        <p class="font-bold">年間</p>
+                    </div>
+                    <div class="flex flex-col space-y-2">
+                        <div class="flex items-center"><span class="text-2xl mr-2">❌</span><span class="font-bold">イラク</span></div>
+                        <div class="flex items-center"><span class="text-2xl mr-2">❌</span><span class="font-bold">アフガニスタン</span></div>
+                        <div class="flex items-center"><span class="text-2xl mr-2">❌</span><span class="font-bold">ウクライナ (泥沼化)</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">3. トランプ政権内の対立構造</h2>
+                <p class="mb-6">トランプ大統領の周辺では、イランに対する方針が大きく分かれています。過去の失敗を教訓とする慎重派は少数派で、依然として強硬派が多数を占めています。</p>
+                <div class="chart-container">
+                    <canvas id="factionChart"></canvas>
+                </div>
+            </section>
+            
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">4. 「終わりのない戦争」の再来か</h2>
+                <p class="mb-6">米国にはイランの核施設を破壊する軍事力はあっても、その広大な国土を占領・統治する能力はありません。これはイラクやアフガニスタンの二の舞になる危険性をはらんでいます。</p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <span class="text-4xl mr-4">💣</span>
+                            <div>
+                                <h3 class="font-bold">限定的な爆撃</h3>
+                                <p class="text-green-600 font-bold">能力あり</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-4xl mr-4">🗺️</span>
+                            <div>
+                                <h3 class="font-bold">国家の占領・統治</h3>
+                                <p class="text-red-600 font-bold">能力なし</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container h-64 md:h-80">
+                         <canvas id="powerComparisonChart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">5. 地政学的ドミノ：日本の危機</h2>
+                <p class="mb-6">米イラン戦争が勃発すれば、米国の関心は中東に集中します。その結果生じる「力の空白」は、中国に絶好の機会を与え、日本の安全保障を直接的に脅かすことになります。</p>
+                <div class="flex flex-col md:flex-row items-center justify-around space-y-4 md:space-y-0 md:space-x-4 text-center">
+                    <div class="p-4 rounded-lg bg-slate-200">
+                        <p class="text-4xl mb-2">⚔️</p>
+                        <p class="font-bold">米イラン戦争<br>勃発</p>
+                    </div>
+                    <div class="flow-arrow transform md:rotate-0 rotate-90">➡️</div>
+                    <div class="p-4 rounded-lg bg-slate-200">
+                        <p class="text-4xl mb-2">🌏</p>
+                        <p class="font-bold">米国の関心が<br>東アジアから離脱</p>
+                    </div>
+                    <div class="flow-arrow transform md:rotate-0 rotate-90">➡️</div>
+                    <div class="p-4 rounded-lg bg-slate-200">
+                        <p class="text-4xl mb-2">🐉</p>
+                        <p class="font-bold">中国が台湾へ<br>圧力を強化</p>
+                    </div>
+                    <div class="flow-arrow transform md:rotate-0 rotate-90">➡️</div>
+                    <div class="p-4 rounded-lg bg-red-200">
+                        <p class="text-4xl mb-2">🇯🇵</p>
+                        <p class="font-bold">日本の孤立<br>安全保障の危機</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">6. 日本のグランドストラテジーはどこに？</h2>
+                <p class="mb-6">日本の国益は米イランの戦争回避にありますが、日本の外交・防衛政策は長期的な戦略を欠き、対米依存から脱却できずにいます。</p>
+                 <div class="flex items-center justify-center p-4 rounded-lg bg-amber-100 border-2 border-amber-300">
+                     <p class="text-4xl mr-4">🙏</p>
+                     <p class="font-bold text-slate-700">現状の戦略：「10年後も20年後もアメリカが守ってくれる」という希望的観測と依存。</p>
+                 </div>
+            </section>
+            
+             <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">7. リアリズムの誤解：思考停止する国内言論</h2>
+                <p class="mb-6">国内の一部保守言論は、米国のネオコンの主張を模倣し、強硬策を「リアリズム」と見なしていますが、これは国益を損なう思考停止に他なりません。</p>
+                <div class="flex items-center justify-center p-4 rounded-lg bg-slate-200">
+                    <div class="text-center">
+                        <p class="text-3xl">🗣️</p>
+                        <p class="font-bold">米ネオコン</p>
+                    </div>
+                    <div class="mx-4 text-2xl font-bold text-[#FF5733]">➡️</div>
+                     <p class="text-lg font-bold">「イランに強硬な態度を！」</p>
+                    <div class="mx-4 text-2xl font-bold text-[#FF5733]">➡️</div>
+                    <div class="text-center">
+                         <p class="text-3xl">🦜</p>
+                         <p class="font-bold">日本の保守言論</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">8. 真のリアリズム：バランス・オブ・パワー</h2>
+                <p class="mb-6">国際政治における真のリアリズムとは、力の均衡を維持することです。現状のアメリカは、No.2の中国に対抗するためNo.3のロシアと連携すべきところを、両方を敵に回すという戦略的失敗を犯しています。</p>
+                <div class="chart-container">
+                    <canvas id="powerBalanceChart"></canvas>
+                </div>
+            </section>
+            
+        </main>
+
+    </div>
+
+    <script>
+        const vibrantPalette = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF', '#33FFF3'];
+
+        const wrapLabel = (str, maxWidth) => {
+            if (str.length <= maxWidth) {
+                return str;
+            }
+            const words = str.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + word).length > maxWidth) {
+                    lines.push(currentLine.trim());
+                    currentLine = '';
+                }
+                currentLine += word + ' ';
+            }
+            lines.push(currentLine.trim());
+            return lines;
+        };
+        
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            } else {
+              return label;
+            }
+        };
+
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 14,
+                            weight: 'bold',
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback,
+                    }
+                }
+            }
+        };
+
+        const factionCtx = document.getElementById('factionChart');
+        if (factionCtx) {
+            new Chart(factionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['強硬派 (ネオコン等)', '慎重派 (ヴァンス、コルビー等)'],
+                    datasets: [{
+                        label: '政権内勢力',
+                        data: [80, 20],
+                        backgroundColor: [vibrantPalette[0], vibrantPalette[2]],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: defaultChartOptions
+            });
+        }
+        
+        const powerComparisonCtx = document.getElementById('powerComparisonChart');
+        if(powerComparisonCtx) {
+            new Chart(powerComparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['相対的軍事力 (質・量・継戦能力)'],
+                    datasets: [
+                        {
+                            label: 'イラン',
+                            data: [85],
+                            backgroundColor: vibrantPalette[0],
+                            borderColor: vibrantPalette[0],
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'ウクライナ',
+                            data: [60],
+                            backgroundColor: vibrantPalette[2],
+                            borderColor: vibrantPalette[2],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    ...defaultChartOptions,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + ' (評価値)'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        ...defaultChartOptions.plugins,
+                        title: {
+                            display: true,
+                            text: 'イランとウクライナの軍事力比較 (専門家見解に基づく推定)',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+        }
+
+        const powerBalanceCtx = document.getElementById('powerBalanceChart');
+        if (powerBalanceCtx) {
+            new Chart(powerBalanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['アメリカ', '中国', 'ロシア'].map(l => wrapLabel(l, 16)),
+                    datasets: [{
+                        label: '総合的な国力指数 (推定)',
+                        data: [100, 85, 45],
+                        backgroundColor: [vibrantPalette[2], vibrantPalette[0], '#FFC300'],
+                    }]
+                },
+                options: {
+                    ...defaultChartOptions,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    },
+                     plugins: {
+                        ...defaultChartOptions.plugins,
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: '世界のパワーバランス (推定値)',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
