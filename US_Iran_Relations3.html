@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インタラクティブスライド：米国外交の失敗と日本の危機</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .slide {
+            display: none;
+        }
+        .slide.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl">
+        <h1 class="text-2xl md:text-3xl font-black text-gray-800 text-center mb-6">米国外交の失敗と日本の危機</h1>
+
+        <div id="slides-container" class="bg-white rounded-lg shadow-2xl overflow-hidden mb-6" style="height: 60vh; min-height: 500px;">
+
+            <!-- Slide 1 -->
+            <div class="slide active flex-col h-full p-6 md:p-10" data-slide="1">
+                <div class="flex-grow flex flex-col justify-center items-center text-center">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">1. 迷走する米国の対イラン政策</h2>
+                    <div class="w-full grid md:grid-cols-2 gap-6">
+                        <div class="border-4 border-blue-300 rounded-lg p-4">
+                            <h3 class="font-bold text-blue-800">当初の提案 (融和的)</h3>
+                            <p class="text-5xl my-3">🤝</p>
+                            <p>限定的なウラン濃縮を容認し、制裁解除を示唆</p>
+                        </div>
+                        <div class="border-4 border-red-400 rounded-lg p-4">
+                            <h3 class="font-bold text-red-800">現在の要求 (強硬的)</h3>
+                            <p class="text-5xl my-3">💥</p>
+                            <p>全ての核開発能力の完全放棄を要求</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                    <p class="text-gray-700">現在、アメリカとイランの間では核開発の凍結に関する交渉が進行中ですが、アメリカ側の要求が二転三転し、関係は悪化の一途をたどっています。当初は、ある程度のウラン濃縮を認める姿勢でしたが、今では全ての核開発能力の放棄を要求しており、この強硬な姿勢が戦争のリスクを高めています。</p>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="2">
+                <div class="flex-grow flex flex-col justify-center items-center text-center">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">2. 失敗続きのアメリカ外交30年</h2>
+                    <div class="w-full">
+                        <div class="flex justify-between items-center text-center text-red-600">
+                            <div class="flex-1">
+                                <p class="font-bold">イラク介入</p><p class="text-5xl my-2">FAILED</p>
+                            </div>
+                            <div class="flex-1 text-gray-300 text-4xl font-light">→</div>
+                            <div class="flex-1">
+                                <p class="font-bold">アフガニスタン</p><p class="text-5xl my-2">FAILED</p>
+                            </div>
+                            <div class="flex-1 text-gray-300 text-4xl font-light">→</div>
+                            <div class="flex-1">
+                                <p class="font-bold">ウクライナ戦争</p><p class="text-5xl my-2">FAILED</p>
+                            </div>
+                        </div>
+                         <p class="mt-6 font-semibold text-gray-600">専門家は、過去30年間のアメリカの軍事介入はほとんどが無駄だったと指摘。</p>
+                    </div>
+                </div>
+                <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                    <p class="text-gray-700">専門家は、過去30年間のアメリカの軍事介入と戦争は、ほとんどが無駄であり、何一つ成功していないと指摘しています。国力を浪費し、ウクライナ戦争でも勝利の見通しは立っていません。この失敗の歴史を理解しているのは、トランプ政権内でもごく一部の少数派に過ぎないのが現状です。</p>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="3">
+                 <div class="flex-grow flex flex-col justify-center items-center text-center">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">3. 米国の軍事能力の限界</h2>
+                    <div class="w-full flex justify-around items-center">
+                         <div class="text-center">
+                            <p class="text-2xl font-bold mb-2">核施設への爆撃</p>
+                            <p class="text-8xl text-green-500">✔</p>
+                            <p class="font-bold text-lg">能力あり</p>
+                         </div>
+                         <div class="text-center">
+                            <p class="text-2xl font-bold mb-2">イラン全土の占領</p>
+                            <p class="text-8xl text-red-500">✖</p>
+                            <p class="font-bold text-lg">能力なし</p>
+                         </div>
+                    </div>
+                     <p class="mt-8 font-semibold text-gray-600">「終わりのない戦争」に突入するリスク。</p>
+                </div>
+                <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                     <p class="text-gray-700">現在のアメリカには、イランの核施設を爆撃で破壊する能力はあっても、その広大な国土を占領・統治する能力はありません。これは、イラクやアフガニスタンで経験したような、出口のない「終わりのない戦争」に再び突入する危険性をはらんでいます。</p>
+                </div>
+            </div>
+            
+            <!-- Slide 4 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="4">
+                <div class="flex-grow flex flex-col justify-center items-center text-center">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">4. 米イラン戦争がもたらす最悪のシナリオ</h2>
+                     <div class="w-full flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                        <div class="p-3 rounded-lg bg-red-100 border-2 border-red-300"><p>米イラン戦争<br>勃発</p></div>
+                        <div class="text-gray-400 text-3xl transform md:rotate-0 rotate-90">➡️</div>
+                        <div class="p-3 rounded-lg bg-gray-200"><p>アジアの<br>力の空白</p></div>
+                        <div class="text-gray-400 text-3xl transform md:rotate-0 rotate-90">➡️</div>
+                        <div class="p-3 rounded-lg bg-gray-200"><p>中国が<br>台湾侵攻</p></div>
+                        <div class="text-gray-400 text-3xl transform md:rotate-0 rotate-90">➡️</div>
+                        <div class="p-3 rounded-lg bg-red-100 border-2 border-red-300"><p class="font-bold">日本の危機</p></div>
+                    </div>
+                </div>
+                <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                    <p class="text-gray-700">もし米イラン戦争が始まれば、最も利益を得るのは中国です。アメリカが中東に釘付けになっている隙に、中国が台湾を海上封鎖しても、アメリカは介入できません。そうなれば、日本はアメリカの支援を諦め、抵抗できなくなるでしょう。これは、日本の安全保障にとって致命的な事態を意味します。</p>
+                </div>
+            </div>
+            
+             <!-- Slide 5 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="5">
+                <div class="flex-grow flex flex-col justify-center items-center text-center">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">5. 日本のグランドストラテジー不在</h2>
+                    <div class="relative">
+                        <p class="text-8xl">🇺🇸</p>
+                        <p class="absolute bottom-0 right-[-20px] text-5xl animate-bounce">🇯🇵</p>
+                    </div>
+                    <p class="mt-6 text-lg font-semibold text-gray-600">「アメリカが守ってくれる」という対米依存から脱却できず、<br>長期的な国家戦略を欠いている。</p>
+                </div>
+                <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                    <p class="text-gray-700">日本の国益は、アメリカにイランとの戦争を思いとどまらせ、軍事力をアジアに集中させることです。しかし、日本の外交・防衛当局には、10年、20年先を見据えた大戦略がなく、ただひたすらアメリカに依存し続けるという現状維持に甘んじています。</p>
+                </div>
+            </div>
+
+            <!-- Slide 6 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="6">
+                <div class="flex-grow flex flex-col justify-center items-center text-center">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">6. ネタニヤフと日本の保守言論</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-center"><p class="text-5xl">🇮🇱</p><p>ネタニヤフ</p></div>
+                        <div class="text-gray-400 text-3xl">➡️</div>
+                        <div class="text-center"><p class="text-5xl">🦅</p><p>米ネオコン</p></div>
+                        <div class="text-gray-400 text-3xl">➡️</div>
+                        <div class="text-center"><p class="text-5xl">📰</p><p>日本の保守メディア</p></div>
+                    </div>
+                    <p class="mt-6 text-lg font-semibold text-gray-600">国益を無視し、米国の強硬論をそのまま模倣。</p>
+                </div>
+                <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                     <p class="text-gray-700">イスラエルのネタニヤフ首相は長年、アメリカにイランとの戦争をけしかけてきました。不可解なことに、日本の保守派の言論人や一部メディアは、このアメリカのネオコンやイスラエルロビーの主張を、日本の国益を無視してそのまま模倣し、強硬論を煽っているのです。</p>
+                </div>
+            </div>
+            
+            <!-- Slide 7 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="7">
+                <div class="flex-grow flex flex-col justify-center items-center text-center">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">7. リアリズムの誤解</h2>
+                    <div class="w-full max-w-md bg-gray-100 p-4 rounded-lg">
+                        <p class="font-bold text-red-600 text-lg">誤解：「タカ派的態度」 = リアリズム</p>
+                        <p class="my-4 text-4xl font-black text-center">≠</p>
+                        <p class="font-bold text-green-600 text-lg">真実：「力の均衡の維持」 こそがリアリズム</p>
+                    </div>
+                </div>
+                <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                     <p class="text-gray-700">日本の保守派は、タカ派的な態度こそが「リアリズム」だと誤解していますが、国際政治における真のリアリズムとは、力の均衡、つまり「バランス・オブ・パワー」をいかに維持するかを考えることです。その観点から言えば、現在の米国の対外政策は完全に失敗しています。</p>
+                </div>
+            </div>
+
+            <!-- Slide 8 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="8">
+                <div class="flex-grow flex flex-col justify-center items-center text-center">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-6">8. アメリカが生んだ最悪の同盟</h2>
+                    <div class="flex items-center space-x-2">
+                        <div class="text-center p-3 bg-red-100 rounded-lg">
+                            <p class="text-5xl">�🇳</p><p>中国 (No.2)</p>
+                        </div>
+                         <p class="text-4xl">+</p>
+                        <div class="text-center p-3 bg-red-100 rounded-lg">
+                            <p class="text-5xl">🇷🇺</p><p>ロシア (No.3)</p>
+                        </div>
+                        <p class="text-4xl mx-4">vs</p>
+                        <div class="text-center p-3 bg-blue-100 rounded-lg">
+                             <p class="text-5xl">🇺🇸</p><p>米国 (No.1)</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-lg font-semibold text-gray-600">アメリカはロシアを敵に回し、中露を結束させてしまった。</p>
+                </div>
+                <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                    <p class="text-gray-700">リアリズムの観点では、世界第1位のアメリカは、第2位の中国の脅威に対抗するため、第3位のロシアと手を組むべきでした。しかし、アメリカはロシアまで敵に回し、結果的に中国とロシアを固く結束させてしまったのです。これは、日本外交にとっても大失敗と言えます。</p>
+                </div>
+            </div>
+
+            <!-- Slide 9 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="9">
+                <div class="flex-grow flex flex-col justify-center items-start text-left">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 self-center">YouTube用コンテンツ案</h2>
+                    <div class="w-full space-y-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-blue-700">【タイトル案】</h3>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>【日本の終焉】米イラン戦争が勃発する日。地政学の専門家が語る、誰も知らない最悪のシナリオ。</li>
+                                <li>なぜアメリカは失敗を繰り返すのか？30年の介入史が暴く「終わらない戦争」の正体。</li>
+                                <li>日本の保守は誰の味方だ？国益を損なう「思考停止のリアリズム」を徹底解剖。</li>
+                            </ul>
+                        </div>
+                         <div>
+                            <h3 class="font-bold text-lg text-blue-700">【概要欄】</h3>
+                            <p class="text-sm bg-gray-100 p-2 rounded">迷走する米国の外交政策。最大の焦点であるイランとの対立は、今、まさに戦争勃発の瀬戸際にあります。この動画では、もし米イラン戦争が勃発した場合、世界、そして日本にどのような影響が及ぶのかを、国際政治学の「リアリズム」の観点から徹底的に分析します...</p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                     <p class="text-gray-700">これらのスライドの内容を基に、より多くの視聴者に問題を訴えかけるためのYouTube動画を作成することが可能です。</p>
+                </div>
+            </div>
+            
+             <!-- Slide 10 -->
+            <div class="slide flex-col h-full p-6 md:p-10" data-slide="10">
+                <div class="flex-grow flex flex-col justify-center items-start text-left">
+                    <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 self-center">YouTube用コンテンツ案 (続き)</h2>
+                    <div class="w-full space-y-4">
+                        <div>
+                            <h3 class="font-bold text-lg text-purple-700">【サムネイル生成用プロンプト案】</h3>
+                            <ul class="list-disc list-inside space-y-1 text-sm">
+                                <li>`A geopolitical chessboard. The Japanese flag king is checkmated by a Chinese dragon piece and a Russian bear piece, as an American eagle piece is distracted by a fire in the Middle East. Tense, dramatic, realistic style. --ar 16:9`</li>
+                                <li>`A political cartoon showing a giant domino labeled "US-Iran War" about to topple a smaller domino labeled "Taiwan," which will then hit the final, smallest domino labeled "Japan." --ar 16:9 --style raw`</li>
+                                <li>`A split image. On the left, Donald Trump surrounded by shouting neocons. On the right, an anxious Japanese prime minister looks at a map of Asia where Taiwan is glowing red. --ar 16:9`</li>
+                            </ul>
+                        </div>
+                         <div>
+                            <h3 class="font-bold text-lg text-purple-700">【BGM生成用プロンプト案 (Suno AIなど)】</h3>
+                           <ul class="list-disc list-inside space-y-1 text-sm">
+                                <li>`Tense, suspenseful, cinematic orchestral music, deep strings, ticking clock, powerful timpani drums, high-stakes geopolitical drama.`</li>
+                                <li>`Dark, atmospheric, investigative background track, pulsating synth bass, minimalist electronic beat, haunting piano melody.`</li>
+                                <li>`Epic, thoughtful, somber instrumental, grand piano theme, sweeping strings, ambient pads, sense of historical scale.`</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                 <div class="mt-auto pt-4 border-t-2 border-gray-200">
+                     <p class="text-gray-700">視覚と聴覚に訴えかけることで、複雑な国際問題をより多くの人々に分かりやすく伝えることができます。</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="flex justify-between items-center w-full">
+            <button id="prev-btn" class="bg-gray-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 disabled:bg-gray-300">前へ</button>
+            <div id="page-counter" class="font-bold text-gray-700">1 / 10</div>
+            <button id="next-btn" class="bg-gray-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-600 disabled:bg-gray-300">次へ</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const pageCounter = document.getElementById('page-counter');
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function showSlide(index) {
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+                pageCounter.textContent = `${index + 1} / ${totalSlides}`;
+                prevBtn.disabled = index === 0;
+                nextBtn.disabled = index === totalSlides - 1;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            });
+
+            showSlide(currentSlide);
+        });
+    </script>
+
+</body>
+</html>
