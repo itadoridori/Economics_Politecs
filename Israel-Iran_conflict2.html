@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インフォグラフィック：イスラエル・イラン紛争 - 影の戦争から直接対決へ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: A single-page, top-to-bottom scrolling narrative infographic. The structure begins with a strong visual hook (the 2024 direct attacks), then travels back in time to establish historical context, explores the key components of the conflict (proxies, nuclear issue), analyzes the economic impact, and concludes with future scenarios. This narrative flow was chosen to first grab the user's attention with the most recent, dramatic events, and then provide the necessary depth and context in a logical sequence, making the complex topic digestible for a broader audience. -->
+    <!-- Visualization & Content Choices: 
+        - Hook (Data Point: 300+ projectiles): Goal: Inform -> Viz: Single Big Number -> Justification: Immediately conveys the scale of Iran's direct attack. -> Method: HTML/CSS.
+        - Timeline (Data Point: Key events from 1979-2024): Goal: Change -> Viz: Vertical Timeline -> Justification: Clearly shows the chronological progression from alliance to open conflict. -> Method: HTML/CSS with Tailwind.
+        - Axis of Resistance (Data Point: Iran's proxy network): Goal: Organize/Relationships -> Viz: Flow Chart-style diagram -> Justification: Visually represents the hierarchical and networked relationship between Iran and its proxies more effectively than a simple list. -> Method: HTML/CSS with Tailwind.
+        - Nuclear Enrichment (Data Point: Iran's uranium enrichment levels): Goal: Compare -> Viz: Bar Chart -> Justification: Provides a stark visual comparison between JCPOA limits, current levels, and weapons-grade requirements, highlighting the core threat. -> Method: Chart.js/Canvas.
+        - Oil Price (Data Point: Price fluctuations around the conflict): Goal: Change -> Viz: Line Chart -> Justification: Clearly illustrates the immediate market volatility and economic impact of the conflict. -> Method: Chart.js/Canvas.
+        - Hormuz Strait (Data Point: 20% of world's oil): Goal: Inform -> Viz: Donut Chart with Big Number -> Justification: A classic infographic element to show a critical proportion in an easily digestible format. -> Method: Chart.js/Canvas.
+        - Future Scenarios (Data Point: 3 possible outcomes): Goal: Organize/Compare -> Viz: Styled cards in a grid -> Justification: Allows for easy side-by-side comparison of potential futures, using icons and color to differentiate them. -> Method: HTML/CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; background-color: #f0f2f5; }
+        .bg-gradient-header { background: linear-gradient(135deg, #1a237e 0%, #283593 100%); }
+        .brand-blue { color: #0047FF; }
+        .brand-orange { color: #FF8C00; }
+        .brand-purple { color: #9300FF; }
+        .brand-pink { color: #FF007A; }
+        .brand-cyan { color: #00E5FF; }
+        .section-title { font-weight: 900; letter-spacing: 0.05em; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); padding: 1.5rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1); }
+        .timeline-item::before { content: ''; position: absolute; left: 11px; top: 12px; width: 2px; height: 100%; background-color: #cbd5e1; }
+        .timeline-item:last-child::before { display: none; }
+        .timeline-dot { transition: all 0.2s ease; }
+        .timeline-item:hover .timeline-dot { transform: scale(1.2); background-color: #FF8C00; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-gradient-header text-white text-center py-12 md:py-20 px-4">
+        <h1 class="text-4xl md:text-6xl font-black mb-4">影の戦争から直接対決へ</h1>
+        <p class="text-xl md:text-2xl max-w-3xl mx-auto text-gray-200">イスラエルとイラン、数十年にわたる対立の新たな局面をインフォグラフィックで解き明かす</p>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="turning-point" class="my-12 md:my-16">
+            <h2 class="section-title text-3xl md:text-4xl text-center mb-4">歴史が動いた日：<span class="brand-pink">2024年の直接衝突</span></h2>
+            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">長年の水面下での対立は、2024年4月、互いの領土への直接攻撃という形で、ついに火を噴きました。これは、両国関係における決定的な転換点です。</p>
+            <div class="grid md:grid-cols-3 gap-8 items-center">
+                <div class="card text-center">
+                    <p class="text-lg text-gray-600">イスラエルが攻撃</p>
+                    <p class="text-xl font-bold my-2">ダマスカスの<br/>イラン領事館</p>
+                    <p class="text-5xl font-black brand-orange">4<span class="text-3xl">月</span>1<span class="text-3xl">日</span></p>
+                    <p class="mt-2 text-sm text-gray-500">革命防衛隊の司令官が殺害され、イランの「主権」が侵害されたと見なされた。</p>
+                </div>
+                <div class="text-center text-5xl font-black text-gray-300 mx-auto">→</div>
+                 <div class="card text-center">
+                    <p class="text-lg text-gray-600">イランが報復攻撃</p>
+                     <p class="text-xl font-bold my-2">イスラエル領土へ<br/>史上初の直接攻撃</p>
+                    <p class="text-5xl font-black brand-pink">300+</p>
+                    <p class="mt-2 text-sm text-gray-500">ドローン、巡航・弾道ミサイルによる大規模な攻撃が行われた。</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-t-2 border-dashed border-gray-300 my-16"></div>
+
+        <section id="history" class="my-12 md:my-16">
+            <h2 class="section-title text-3xl md:text-4xl text-center mb-12">対立の起源：<span class="brand-blue">協力から敵対へ</span></h2>
+            <div class="relative max-w-4xl mx-auto">
+                <div class="absolute w-0.5 h-full bg-gray-300 left-1/2 transform -translate-x-1/2"></div>
+                <div class="relative mb-8">
+                    <div class="md:flex items-center">
+                        <div class="md:w-1/2 md:pr-8">
+                             <div class="card">
+                                <p class="font-bold text-2xl text-center brand-blue">1979年以前：周辺同盟</p>
+                                <p class="mt-4 text-gray-600">驚くべきことに、かつて両国は非公式な同盟関係にありました。アラブ諸国という共通の脅威に対抗するため、諜報活動や軍事面で密接に協力。「周辺同盟」として知られる実利的なパートナーでした。</p>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2"></div>
+                    </div>
+                </div>
+                 <div class="relative">
+                    <div class="md:flex items-center flex-row-reverse">
+                        <div class="md:w-1/2 md:pl-8">
+                            <div class="card">
+                                <p class="font-bold text-2xl text-center brand-pink">1979年：イスラム革命</p>
+                                <p class="mt-4 text-gray-600">ホメイニ師による革命でイランの体制が激変。親米君主制から反米・反シオニズムを掲げる神政政治へ。イスラエルは「占領者」と再定義され、関係は一夜にして協力から敵対へと転換しました。</p>
+                            </div>
+                        </div>
+                        <div class="md:w-1/2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-t-2 border-dashed border-gray-300 my-16"></div>
+
+        <section id="axis-of-resistance" class="my-12 md:my-16">
+            <h2 class="section-title text-3xl md:text-4xl text-center mb-4">イランの戦略：<span class="brand-purple">「抵抗の枢軸」</span></h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">通常戦力で劣るイランは、中東各地の代理勢力（プロキシ）を支援する「前方防衛」戦略を採用。自国から離れた場所でイスラエルや米国を消耗させ、影響力を行使します。</p>
+            <div class="card">
+                <div class="flex flex-col items-center">
+                    <div class="bg-purple-100 text-purple-800 p-4 rounded-lg shadow-md">
+                        <p class="text-2xl font-bold text-center">🇮🇷 イラン</p>
+                        <p class="text-center text-sm">(資金、武器、訓練を提供)</p>
+                    </div>
+                    <div class="h-12 w-0.5 bg-gray-300 my-2"></div>
+                    <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                        <div class="flex flex-col items-center">
+                            <div class="w-full h-0.5 bg-gray-300 mb-2"></div>
+                             <div class="bg-gray-50 p-3 rounded-lg w-full border border-gray-200">
+                                <p class="text-xl font-bold">🇱🇧 ヒズボラ</p>
+                                <p class="text-sm text-gray-500">「枢軸の至宝」<br/>最強の代理勢力</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                             <div class="w-full h-0.5 bg-gray-300 mb-2"></div>
+                             <div class="bg-gray-50 p-3 rounded-lg w-full border border-gray-200">
+                                <p class="text-xl font-bold">🇵🇸 ハマス</p>
+                                <p class="text-sm text-gray-500">ガザからの<br/>南方戦線</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                             <div class="w-full h-0.5 bg-gray-300 mb-2"></div>
+                            <div class="bg-gray-50 p-3 rounded-lg w-full border border-gray-200">
+                                <p class="text-xl font-bold">🇾🇪 フーシ派</p>
+                                <p class="text-sm text-gray-500">紅海の<br/>海上交通路を脅かす</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-center">
+                           <div class="w-full h-0.5 bg-gray-300 mb-2"></div>
+                            <div class="bg-gray-50 p-3 rounded-lg w-full border border-gray-200">
+                                <p class="text-xl font-bold">🇮🇶🇸🇾 シーア派民兵</p>
+                                <p class="text-sm text-gray-500">イラク・シリアでの<br/>影響力行使</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-t-2 border-dashed border-gray-300 my-16"></div>
+        
+        <section id="battlegrounds" class="my-12 md:my-16">
+            <h2 class="section-title text-3xl md:text-4xl text-center mb-4">紛争の最前線</h2>
+            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">対立は物理的な戦場だけでなく、核開発やサイバー空間でも繰り広げられています。</p>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="card md:col-span-2">
+                    <h3 class="text-2xl font-bold text-center mb-4 brand-orange">核問題：存在をかけた対立</h3>
+                    <p class="text-center max-w-xl mx-auto text-gray-600 mb-6">イスラエルにとって、イランの核武装は「存在を脅かす脅威」。紛争の根底にある最大の火種です。イランは現在、核兵器に転用可能なレベルに近づいています。</p>
+                    <div class="chart-container h-80 md:h-96">
+                        <canvas id="nuclearChart"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                     <h3 class="text-2xl font-bold text-center mb-4 brand-blue">シリア：代理戦争のるつぼ</h3>
+                     <p class="text-gray-600">シリア内戦を機に、イランは軍事拠点を構築。イスラエルはこれを阻止するため「戦間期戦役」と呼ばれる数百回の空爆を実施。代理戦争が直接衝突する主戦場となりました。</p>
+                </div>
+                 <div class="card">
+                    <h3 class="text-2xl font-bold text-center mb-4 brand-purple">サイバー空間：見えざる戦い</h3>
+                    <p class="text-gray-600">物理的な攻撃と並行し、重要インフラ（発電所、水道施設）や核施設を標的としたサイバー攻撃が日常的に行われています。これもまた「影の戦争」の重要な側面です。</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="border-t-2 border-dashed border-gray-300 my-16"></div>
+
+        <section id="impact" class="my-12 md:my-16">
+            <h2 class="section-title text-3xl md:text-4xl text-center mb-4">世界への衝撃：<span class="brand-pink">経済的波及</span></h2>
+            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">この地域の紛争は、対岸の火事ではありません。世界のエネルギー供給網と経済に直接的な影響を与えます。</p>
+             <div class="grid md:grid-cols-5 gap-8">
+                <div class="md:col-span-3 card">
+                     <h3 class="text-2xl font-bold text-center mb-4">原油価格の急騰</h3>
+                     <p class="text-center text-gray-600 mb-6">紛争激化の報道は、即座に原油価格を押し上げます。これは世界的なインフレと景気後退のリスクを高めます。</p>
+                    <div class="chart-container h-80">
+                         <canvas id="oilPriceChart"></canvas>
+                    </div>
+                </div>
+                <div class="md:col-span-2 card">
+                    <h3 class="text-2xl font-bold text-center mb-4">ホルムズ海峡の危機</h3>
+                    <p class="text-center text-gray-600 mb-6">イランが封鎖を仄めかす、世界で最も重要な石油の輸送路。</p>
+                    <div class="chart-container h-80">
+                        <canvas id="hormuzChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="border-t-2 border-dashed border-gray-300 my-16"></div>
+
+        <section id="future" class="my-12 md:my-16">
+            <h2 class="section-title text-3xl md:text-4xl text-center mb-4">今後のシナリオ：<span class="brand-blue">道筋と危険</span></h2>
+            <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">両国が新たな「交戦規則」を模索する中、将来は3つのシナリオが考えられます。</p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card text-center border-t-4 border-green-400">
+                    <p class="text-5xl mb-4">🤫</p>
+                    <h3 class="text-2xl font-bold mb-2">影への回帰</h3>
+                    <p class="text-gray-600">双方が抑止力を再確認し、再び代理戦争や秘密作戦が中心の「影の戦争」状態に戻る。国際社会が望む展開。</p>
+                </div>
+                 <div class="card text-center border-t-4 border-yellow-400">
+                    <p class="text-5xl mb-4">⚖️</p>
+                    <h3 class="text-2xl font-bold mb-2">抑制されたエスカレーション</h3>
+                    <p class="text-gray-600">限定的な直接攻撃の応酬が「新たな常態」となる。常に全面戦争のリスクをはらむ、極めて不安定な均衡状態。</p>
+                </div>
+                <div class="card text-center border-t-4 border-red-500">
+                    <p class="text-5xl mb-4">💥</p>
+                    <h3 class="text-2xl font-bold mb-2">全面的な地域戦争</h3>
+                    <p class="text-gray-600">どちらかの誤算、またはイランの核開発阻止というイスラエルの決断が引き金となり、中東全域を巻き込む破滅的な戦争に突入する。</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white text-center p-8 mt-16">
+        <p>このインフォグラフィックは、提供された戦略分析レポートに基づいて作成されました。</p>
+        <p class="text-sm text-gray-400 mt-2">データ可視化デモンストレーション用</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const wrapLabel = (label, maxLength = 16) => {
+                if (label.length <= maxLength) {
+                    return label;
+                }
+                const words = label.split('');
+                const lines = [];
+                let currentLine = '';
+                for (const word of words) {
+                    if ((currentLine + word).length > maxLength) {
+                        lines.push(currentLine.trim());
+                        currentLine = '';
+                    }
+                    currentLine += word;
+                }
+                lines.push(currentLine.trim());
+                return lines;
+            };
+            
+            const tooltipTitleCallback = (tooltipItems) => {
+                const item = tooltipItems[0];
+                let label = item.chart.data.labels[item.dataIndex];
+                if (Array.isArray(label)) {
+                    return label.join('');
+                } else {
+                    return label;
+                }
+            };
+
+            const nuclearChartCtx = document.getElementById('nuclearChart')?.getContext('2d');
+            if (nuclearChartCtx) {
+                new Chart(nuclearChartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            wrapLabel('JCPOA合意上限'),
+                            wrapLabel('近年の濃縮レベル'),
+                            wrapLabel('兵器級レベル')
+                        ],
+                        datasets: [{
+                            label: 'ウラン濃縮度 (%)',
+                            data: [3.67, 60, 90],
+                            backgroundColor: ['#00E5FF', '#FF8C00', '#FF007A'],
+                            borderColor: ['#00B8D9', '#CC7000', '#CC0062'],
+                            borderWidth: 2,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: { display: false },
+                            title: { display: true, text: 'イランのウラン濃縮レベル比較 (%)', font: { size: 16 } },
+                            tooltip: { callbacks: { title: tooltipTitleCallback } }
+                        },
+                        scales: {
+                            x: { max: 100, grid: { color: '#e2e8f0' } },
+                            y: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            const oilPriceChartCtx = document.getElementById('oilPriceChart')?.getContext('2d');
+            if (oilPriceChartCtx) {
+                new Chart(oilPriceChartCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['紛争前', '領事館攻撃', 'イラン報復', '報復後', '予測'],
+                        datasets: [{
+                            label: 'ブレント原油価格 (USD/バレル)',
+                            data: [87, 89, 92, 90, 100],
+                            borderColor: '#FF007A',
+                            backgroundColor: 'rgba(255, 0, 122, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: '#FF007A',
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                           legend: { display: false },
+                           tooltip: { callbacks: { title: tooltipTitleCallback } }
+                        },
+                        scales: {
+                            y: { beginAtZero: false, grid: { color: '#e2e8f0' } }
+                        }
+                    }
+                });
+            }
+            
+            const hormuzChartCtx = document.getElementById('hormuzChart')?.getContext('2d');
+            if (hormuzChartCtx) {
+                new Chart(hormuzChartCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['ホルムズ海峡経由', 'その他'],
+                        datasets: [{
+                            data: [20, 80],
+                            backgroundColor: ['#9300FF', '#e2e8f0'],
+                            borderColor: ['#ffffff'],
+                            borderWidth: 4,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            title: { display: true, text: '世界の石油輸送に占める割合', font: { size: 14 } },
+                            tooltip: { callbacks: { title: tooltipTitleCallback } }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

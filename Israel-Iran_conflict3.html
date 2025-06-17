@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スライドで学ぶ：イスラエル・イラン紛争</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f1f5f9;
+        }
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .slide.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chart-container {
+             position: relative;
+             margin: auto;
+             height: 80%;
+             width: 80%;
+        }
+        .narration-box {
+            background-color: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            line-height: 1.7;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+         .nav-button {
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .nav-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .nav-button:disabled {
+            background-color: rgba(0, 0, 0, 0.2);
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div id="slide-container" class="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden">
+        <div class="aspect-[16/9] relative">
+            <!-- Slides will be injected here by JS -->
+        </div>
+    </div>
+    
+    <div class="w-full max-w-4xl mt-4">
+        <div id="narration-container" class="narration-box">
+            <!-- Narration script will be injected here by JS -->
+        </div>
+    </div>
+
+    <div class="flex items-center justify-center gap-8 mt-4">
+        <button id="prev-btn" class="nav-button">‹</button>
+        <div id="pagination" class="text-xl font-bold text-slate-700"></div>
+        <button id="next-btn" class="nav-button">›</button>
+    </div>
+
+    <script>
+        const slidesData = [
+            {
+                type: 'title',
+                title: '影の戦争から直接対決へ',
+                subtitle: 'スライドで学ぶ：イスラエル・イラン紛争',
+                narration: '2024年、イスラエルとイランの対立は、歴史的な転換点を迎えました。これまで水面下で行われてきた「影の戦争」は、ついに公然たる直接対決へと発展したのです。このプレゼンテーションでは、数十年にわたる複雑な紛争の歴史、その構造、そして未来への影響を、インフォグラフィックスを用いて分かりやすく解説します。'
+            },
+            {
+                type: 'infographic',
+                title: '歴史的転換点：1979年イラン・イスラム革命',
+                elements: [
+                    { type: 'card', year: '1979年以前', theme: '協力', icon: '🤝', text: '「周辺同盟」として非公式な協力関係。共通の脅威（アラブ民族主義）に対抗するため、諜報・軍事面で連携。', color: 'bg-blue-100' },
+                    { type: 'arrow', direction: 'right' },
+                    { type: 'card', year: '1979年', theme: '革命', icon: '💥', text: 'イスラム革命により、親米君主制が反米・反シオニズム体制へ。イデオロギーが180度転換。', color: 'bg-red-200' },
+                     { type: 'arrow', direction: 'right' },
+                    { type: 'card', year: '1979年以降', theme: '敵対', icon: '⚔️', text: '国交断絶。イスラエルは「占領者」と再定義され、両国は公然たる敵対関係に。', color: 'bg-red-100' }
+                ],
+                narration: '現在の敵対関係は、古代からの憎悪ではありません。その原点は1979年のイラン・イスラム革命です。この革命を境に、かつては非公式な同盟国として協力していた両国の関係は、一夜にして修復不可能なイデオロギー的断絶へと至り、今日まで続く紛争の幕開けとなりました。'
+            },
+            {
+                type: 'timeline',
+                title: '対立の年表：主要な出来事',
+                narration: '革命後、両国の対立は段階的にエスカレートしていきました。イランによる代理勢力「ヒズボラ」の設立、イランの核開発疑惑とそれに対するイスラエルの妨害工作、そしてシリア内戦を舞台にした間接的な衝突。これらの出来事の積み重ねが、2024年の直接対決へと繋がっていきます。'
+            },
+            {
+                type: 'diagram',
+                title: 'イランの戦略：抵抗の枢軸',
+                narration: '通常戦力で劣るイランは、中東各地の代理勢力、いわゆる「抵抗の枢軸」を築くことで、イスラエルやアメリカに対抗しています。レバノンのヒズボラを筆頭に、パレスチナのハマス、イエメンのフーシ派などが、イランの国境から遠く離れた場所で、イランの代わりに戦う「前方防衛」の役割を担っているのです。'
+            },
+            {
+                type: 'chart',
+                chartType: 'bar',
+                title: '紛争の核心：イランの核開発問題',
+                data: {
+                    labels: ['JCPOA合意上限 (3.67%)', '近年の濃縮レベル (60%)', '兵器級 (90%以上)'],
+                    datasets: [{
+                        label: 'ウラン濃縮度 (%)',
+                        data: [3.67, 60, 90],
+                        backgroundColor: ['#60a5fa', '#facc15', '#f87171'],
+                        borderColor: ['#2563eb', '#ca8a04', '#dc2626'],
+                        borderWidth: 1
+                    }]
+                },
+                narration: 'この紛争の根底にある最大の火種が、イランの核開発問題です。イスラエルは、イランの核武装を国家存亡の危機と捉え、絶対に容認しない構えです。イランは平和利用を主張しますが、そのウラン濃縮度は、核兵器製造に求められるレベルに近づきつつあり、地域の緊張を極限まで高めています。'
+            },
+            {
+                type: 'infographic_flow',
+                title: '2024年：直接対決へのエスカレーション',
+                narration: '2024年4月1日、イスラエルがシリアのイラン領事館を爆撃し、革命防衛隊の司令官を殺害。これを自国領土への攻撃と見なしたイランは、4月13日、史上初めてイスラエル領土へ300以上のミサイルやドローンで直接攻撃を行いました。長年の「影の戦争」のルールが破られ、紛争は新たな段階に入りました。'
+            },
+            {
+                type: 'map',
+                title: '国際社会の反応と戦略的計算',
+                narration: 'この紛争は、二国間だけの問題ではありません。アメリカはイスラエルの防衛を支援しつつ、地域戦争への拡大を警戒。中国やロシアは、反西側でイランと連携を強め、外交的に擁護。サウジアラビアやヨルダンといったアラブ諸国も、自国の安定と国益を天秤にかけながら、複雑な対応を迫られています。'
+            },
+            {
+                type: 'chart_combo',
+                title: '世界経済への影響',
+                narration: '中東の緊張は、直ちに世界経済を揺るがします。紛争のニュースは原油価格を急騰させ、世界的なインフレを招く恐れがあります。特に、世界の石油輸送の約2割が通過するホルムズ海峡が封鎖されるような事態になれば、世界経済に壊滅的な打撃を与える可能性があります。'
+            },
+            {
+                type: 'scenario',
+                title: '未来への道筋：3つのシナリオ',
+                narration: '今後、この紛争はどのような道をたどるのでしょうか。考えられるシナリオは3つ。再び水面下の「影の戦争」に戻る道。限定的な直接攻撃が常態化する、危険な均衡状態。そして、どちらかの誤算が引き金となる、地域全体を巻き込む「全面戦争」。未来は、今もなお予断を許さない状況です。'
+            },
+            {
+                type: 'youtube',
+                title: 'YouTube配信用コンテンツ案',
+                narration: 'このスライドの内容を基に、YouTube動画を制作する際のアイデアをまとめました。タイトル、概要、サムネイル、そしてBGMのプロンプトとしてご活用ください。'
+            }
+        ];
+
+        let currentSlide = 0;
+        const slideContainer = document.getElementById('slide-container').querySelector('div');
+        const narrationContainer = document.getElementById('narration-container');
+        const paginationEl = document.getElementById('pagination');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        let charts = {};
+
+        function renderSlide(index) {
+            const slideData = slidesData[index];
+            let content = '';
+            
+            switch (slideData.type) {
+                case 'title':
+                    content = `<div class="w-full h-full flex flex-col items-center justify-center text-center p-8 bg-slate-800 text-white">
+                        <h1 class="text-5xl font-black mb-4">${slideData.title}</h1>
+                        <p class="text-2xl text-slate-300">${slideData.subtitle}</p>
+                    </div>`;
+                    break;
+                case 'infographic':
+                    content = `<div class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-8">${slideData.title}</h2>
+                        <div class="flex items-center justify-center gap-4">
+                            ${slideData.elements.map(el => {
+                                if (el.type === 'card') {
+                                    return `<div class="text-center p-6 rounded-lg shadow-lg ${el.color} w-60 h-64 flex flex-col justify-center">
+                                        <p class="text-lg font-bold">${el.year}</p>
+                                        <p class="text-5xl my-2">${el.icon}</p>
+                                        <p class="text-2xl font-bold">${el.theme}</p>
+                                        <p class="text-sm mt-2">${el.text}</p>
+                                    </div>`;
+                                }
+                                if (el.type === 'arrow') {
+                                    return `<div class="text-6xl font-thin text-slate-400">→</div>`;
+                                }
+                            }).join('')}
+                        </div>
+                    </div>`;
+                    break;
+                case 'timeline':
+                     content = `
+                        <div class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50">
+                            <h2 class="text-3xl font-bold text-slate-800 mb-8">${slideData.title}</h2>
+                            <div class="space-y-4 text-center">
+                                <p class="text-xl p-2 rounded bg-red-100">1982年：ヒズボラ設立 → 代理戦争開始</p>
+                                <p class="text-3xl text-slate-400">↓</p>
+                                <p class="text-xl p-2 rounded bg-yellow-100">2000年代：核開発疑惑 → 秘密作戦の激化</p>
+                                <p class="text-3xl text-slate-400">↓</p>
+                                <p class="text-xl p-2 rounded bg-orange-100">2011年~：シリア内戦 → 間接的な直接対決</p>
+                                <p class="text-3xl text-slate-400">↓</p>
+                                <p class="text-xl p-2 rounded bg-red-200">2024年：領事館攻撃 → 直接戦争</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                 case 'diagram':
+                    content = `
+                        <div class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50">
+                             <h2 class="text-3xl font-bold text-slate-800 mb-6">${slideData.title}</h2>
+                             <div class="text-center">
+                                 <div class="inline-block bg-red-600 text-white font-bold p-4 rounded-lg shadow-lg">🇮🇷 イラン</div>
+                                 <div class="flex justify-center my-2">
+                                     <div class="h-12 w-0.5 bg-slate-400"></div>
+                                 </div>
+                                 <div class="grid grid-cols-2 gap-x-12 gap-y-4">
+                                     <div class="flex items-center justify-center"><div class="w-full h-0.5 bg-slate-400"></div></div>
+                                     <div class="flex items-center justify-center"><div class="w-full h-0.5 bg-slate-400"></div></div>
+                                     <div class="text-center p-3 rounded-lg bg-slate-100 shadow">🇱🇧 ヒズボラ</div>
+                                     <div class="text-center p-3 rounded-lg bg-slate-100 shadow">🇵🇸 ハマス</div>
+                                      <div class="flex items-center justify-center"><div class="w-full h-0.5 bg-slate-400"></div></div>
+                                     <div class="flex items-center justify-center"><div class="w-full h-0.5 bg-slate-400"></div></div>
+                                     <div class="text-center p-3 rounded-lg bg-slate-100 shadow">🇾🇪 フーシ派</div>
+                                     <div class="text-center p-3 rounded-lg bg-slate-100 shadow">🇮🇶🇸🇾 民兵</div>
+                                 </div>
+                             </div>
+                        </div>
+                    `;
+                    break;
+                case 'chart':
+                    content = `<div class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50">
+                        <h2 class="text-3xl font-bold text-slate-800 mb-4 text-center">${slideData.title}</h2>
+                        <div class="chart-container w-full md:w-3/4 h-3/4">
+                            <canvas id="chart-${index}"></canvas>
+                        </div>
+                    </div>`;
+                    break;
+                case 'infographic_flow':
+                    content = `
+                        <div class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50">
+                            <h2 class="text-3xl font-bold text-slate-800 mb-8">${slideData.title}</h2>
+                            <div class="flex items-center justify-center space-x-4 md:space-x-8">
+                                <div class="text-center border-2 border-blue-500 p-4 rounded-lg shadow-lg bg-blue-50 w-1/3">
+                                    <p class="font-bold text-lg">4月1日：イスラエル攻撃</p>
+                                    <p class="text-4xl my-2">💥</p>
+                                    <p>シリアのイラン領事館を空爆</p>
+                                </div>
+                                <div class="text-5xl font-thin text-slate-500">➡️</div>
+                                <div class="text-center border-2 border-red-500 p-4 rounded-lg shadow-lg bg-red-50 w-1/3">
+                                    <p class="font-bold text-lg">4月13日：イラン報復</p>
+                                     <p class="text-4xl my-2">🚀</p>
+                                    <p>イスラエルへ<br/>300以上の飛翔体</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'map':
+                    content = `
+                        <div class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50">
+                            <h2 class="text-3xl font-bold text-slate-800 mb-6">${slideData.title}</h2>
+                             <div class="grid grid-cols-3 gap-6 text-center w-full max-w-3xl">
+                                <div class="p-4 bg-blue-100 rounded-lg shadow">
+                                    <p class="text-3xl mb-2">🇺🇸</p>
+                                    <p class="font-bold">アメリカ</p>
+                                    <p class="text-sm">イスラエル防衛＋拡大阻止</p>
+                                </div>
+                                 <div class="p-4 bg-red-100 rounded-lg shadow">
+                                    <p class="text-3xl mb-2">🇨🇳🇷🇺</p>
+                                    <p class="font-bold">中国・ロシア</p>
+                                    <p class="text-sm">イラン擁護・反西側連携</p>
+                                </div>
+                                 <div class="p-4 bg-green-100 rounded-lg shadow">
+                                    <p class="text-3xl mb-2">🇸🇦🇯🇴</p>
+                                    <p class="font-bold">アラブ諸国</p>
+                                    <p class="text-sm">自国の安定を最優先</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'chart_combo':
+                     content = `
+                        <div class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50">
+                            <h2 class="text-3xl font-bold text-slate-800 mb-4 text-center">${slideData.title}</h2>
+                            <div class="flex flex-col md:flex-row gap-8 w-full h-4/5">
+                                <div class="w-full md:w-1/2 h-full"><canvas id="chart-line-${index}"></canvas></div>
+                                <div class="w-full md:w-1/2 h-full"><canvas id="chart-doughnut-${index}"></canvas></div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'scenario':
+                    content = `
+                        <div class="w-full h-full flex flex-col items-center justify-center p-8 bg-slate-50">
+                             <h2 class="text-3xl font-bold text-slate-800 mb-8">${slideData.title}</h2>
+                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+                                <div class="p-6 bg-green-100 rounded-lg shadow-md text-center">
+                                    <p class="text-5xl mb-3">🤫</p><h3 class="text-xl font-bold mb-2">影への回帰</h3><p>再び代理戦争・秘密作戦へ</p>
+                                </div>
+                                <div class="p-6 bg-yellow-100 rounded-lg shadow-md text-center">
+                                    <p class="text-5xl mb-3">⚖️</p><h3 class="text-xl font-bold mb-2">抑制されたエスカレーション</h3><p>限定的な直接攻撃が常態化</p>
+                                </div>
+                                <div class="p-6 bg-red-100 rounded-lg shadow-md text-center">
+                                    <p class="text-5xl mb-3">💥</p><h3 class="text-xl font-bold mb-2">全面的な地域戦争</h3><p>誤算による破滅的な戦争</p>
+                                </div>
+                             </div>
+                        </div>
+                    `;
+                    break;
+                case 'youtube':
+                    content = `
+                        <div class="w-full h-full p-8 bg-slate-800 text-white overflow-y-auto">
+                            <h2 class="text-3xl font-bold mb-6 text-center">${slideData.title}</h2>
+                            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                                <div class="bg-slate-700 p-4 rounded-lg">
+                                    <h3 class="font-bold text-lg mb-2">【YouTubeタイトル案】</h3>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>10分でわかるイスラエルvsイラン：なぜ今、直接戦争の危機なのか？</li>
+                                        <li>【図解】影の戦争の終焉：イスラエルとイラン、全面戦争へのカウントダウン</li>
+                                        <li>知らないとヤバい中東情勢：イスラエル・イラン紛争が世界経済に与える影響</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-700 p-4 rounded-lg">
+                                    <h3 class="font-bold text-lg mb-2">【YouTubeサムネイル用プロンプト案】</h3>
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li>A dramatic split-screen image. On the left, the Israeli flag with a fighter jet. On the right, the Iranian flag with a missile launch. Bold text in the middle: "DIRECT WAR".</li>
+                                        <li>An infographic style thumbnail showing a timeline of conflict. Icons for "revolution", "proxy war", "nuclear", and a large explosion icon at the end. Title: "Why NOW?".</li>
+                                        <li>A world map focusing on the Middle East, with red lines connecting Israel and Iran. An icon of a rising oil price barrel. Text: "WORLD IMPACT?".</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-slate-700 p-4 rounded-lg md:col-span-2">
+                                     <h3 class="font-bold text-lg mb-2">【YouTube概要欄】</h3>
+                                     <p class="text-sm">2024年、イスラエルとイランの対立は、数十年にわたる「影の戦争」から、互いの領土を直接攻撃する新たな段階へと突入しました。この動画では、複雑な中東情勢の核心であるイスラエル・イラン紛争について、その歴史的背景、イランの代理勢力戦略「抵抗の枢軸」、核問題をめぐる対立、そして世界経済への影響まで、インフォグラフィックスを使って分かりやすく解説します。なぜ両国はここまで対立するのか？私たちの生活にどんな影響があるのか？この1本で、ニュースの裏側が理解できます。</p>
+                                </div>
+                                <div class="bg-slate-700 p-4 rounded-lg md:col-span-2">
+                                     <h3 class="font-bold text-lg mb-2">【BGM生成用 SUNO AI プロンプト案】</h3>
+                                     <ul class="list-disc list-inside space-y-1">
+                                        <li>Epic cinematic orchestral, tense, dramatic, suspenseful, middle eastern percussion, building tension, serious documentary soundtrack.</li>
+                                        <li>Ambient electronic, investigative, documentary, neutral tone, slightly ominous, data, news report background music.</li>
+                                        <li>Dark, powerful, cinematic trailer music, slow build-up with heavy drums, choir, string section, sense of impending conflict.</li>
+                                     </ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            const slideEl = document.createElement('div');
+            slideEl.className = 'slide w-full h-full absolute top-0 left-0';
+            slideEl.innerHTML = content;
+            slideContainer.appendChild(slideEl);
+        }
+
+        function createChart(index, slideData) {
+            if (charts[index]) return;
+            const ctx = document.getElementById(`chart-${index}`).getContext('2d');
+            charts[index] = new Chart(ctx, {
+                type: slideData.chartType,
+                data: slideData.data,
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+        
+        function createComboChart(index) {
+            if (charts[`line-${index}`]) return;
+
+            const lineCtx = document.getElementById(`chart-line-${index}`).getContext('2d');
+            charts[`line-${index}`] = new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['紛争前', '攻撃後', '予測'],
+                    datasets: [{
+                        label: '原油価格 (USD/バレル)',
+                        data: [87, 92, 105],
+                        borderColor: '#ef4444',
+                        tension: 0.1
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: '原油価格の変動' } } }
+            });
+
+            const doughnutCtx = document.getElementById(`chart-doughnut-${index}`).getContext('2d');
+            charts[`doughnut-${index}`] = new Chart(doughnutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ホルムズ海峡経由の石油', 'その他'],
+                    datasets: [{ data: [20, 80], backgroundColor: ['#f97316', '#e5e7eb'] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: '世界の石油輸送 (約20%)' } } }
+            });
+        }
+
+
+        function updateSlide() {
+            document.querySelectorAll('.slide').forEach((el, i) => {
+                el.classList.toggle('active', i === currentSlide);
+            });
+            
+            const slideData = slidesData[currentSlide];
+            if (slideData.type === 'chart') {
+                createChart(currentSlide, slideData);
+            }
+            if(slideData.type === 'chart_combo') {
+                createComboChart(currentSlide);
+            }
+
+            narrationContainer.textContent = slideData.narration;
+            paginationEl.textContent = `${currentSlide + 1} / ${slidesData.length}`;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slidesData.length - 1;
+        }
+
+        slidesData.forEach((_, i) => renderSlide(i));
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slidesData.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>
