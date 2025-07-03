@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年参院選 政策比較インタラクティブ・ダッシュボード</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 500px;
+            }
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #ca8a04; /* amber-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .policy-grid-party-header {
+            transition: all 0.2s ease-in-out;
+        }
+        .policy-grid-party-header.highlight {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 3px #fbbf24; /* amber-400 */
+            border-radius: 0.5rem;
+        }
+        .modal {
+            display: none;
+        }
+        .modal.is-open {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 text-center">2025年参院選 政策比較ダッシュボード</h1>
+            <p class="text-center text-slate-500 mt-1 text-sm sm:text-base">日本の未来を選択するためのインタラクティブガイド</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section class="mb-12">
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-2 text-center">各党の思想的ポジション</h2>
+            <p class="text-center text-slate-600 mb-6 max-w-3xl mx-auto">報告書の分析に基づき、各党の立ち位置を「経済政策（財政規律 vs 積極財政）」と「安全保障（護憲・平和主義 vs 改憲・現実主義）」の2軸でマッピングしました。各点をクリックすると、下の表で該当する党がハイライトされます。</p>
+            <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg">
+                <div class="chart-container">
+                    <canvas id="politicalSpectrumChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800 mb-6 text-center">主要争点別 政策比較</h2>
+            <div id="tabs-container" class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
+            </div>
+
+            <div id="policy-content-container">
+            </div>
+        </section>
+
+    </main>
+
+    <div id="party-modal" class="modal fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50 transition-opacity duration-300">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-transform duration-300 scale-95">
+            <div id="modal-content" class="p-6 sm:p-8">
+            </div>
+            <div class="bg-slate-100 px-6 py-4 text-right rounded-b-xl">
+                <button id="modal-close-btn" class="px-5 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-opacity-50">閉じる</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="text-center py-6 mt-8 bg-white border-t border-slate-200">
+        <p class="text-slate-500 text-sm">このダッシュボードは提供された報告書に基づき生成されたものです。</p>
+    </footer>
+
+
+    <script>
+        const partyData = {
+            jimin: { name: '自由民主党', shortName: '自民', color: '#ef4444', logo: '自', pos: { x: 3, y: 7 }, detail: '与党として、安定した政治運営を掲げています。経済政策では、財政規律を重視しつつ、経済全体の成長を通じて国民の賃金を上げることを目指します。物価高に対しては、給付と減税を組み合わせて対応する方針です。安全保障については、日本の防衛力を大幅に強化するため、防衛費の増額を掲げています。また、党の目標として憲法改正に積極的で、特に9条改正の議論を主導していく考えです。エネルギー政策では、原子力発電を最大限に活用し、次世代の原子炉開発も推進するとしています。現実主義的な保守の立場から、日本の課題に取り組む姿勢を強調しています。'},
+            komei: { name: '公明党', shortName: '公明', color: '#3b82f6', logo: '公', pos: { x: 2, y: 3 }, detail: '連立与党の一角として、生活者の視点を政策の中心に据えています。経済政策では、物価高に苦しむ家計を支えるため、減税と合わせて、即効性のある給付を重視しています。平和主義を掲げ、外交努力を重視する立場から、憲法9条の改正には慎重で、条文を追加する『加憲』を主張しています。エネルギー政策では、安全性が確認された原発の再稼働は容認しつつも、長期的には原原発への依存度を減らし、将来の脱原発を目指します。また、社会の多様性を尊重する観点から、選択的夫婦別姓の導入にも前向きです。' },
+            rikken: { name: '立憲民主党', shortName: '立憲', color: '#2563eb', logo: '立', pos: { x: -4, y: -6 }, detail: '最大野党の立憲民主党です。『生活安全保障』をスローガンに、現政権との対決姿勢を鮮明にしています。経済政策の柱は、物価高対策です。特に、生活に直結する食料品の消費税を、時限的にゼロにすることを提案しています。平和主義と立憲主義を重視し、憲法9条の改正には慎重な立場です。防衛費についても、増額ありきではなく、その必要性や財源を厳しくチェックすべきだと主張しています。エネルギー政策では、脱原発を明確に掲げ、2050年までに原発のない社会を実現し、再生可能エネルギーへの転換を進めるとしています。'},
+            ishin: { name: '日本維新の会', shortName: '維新', color: '#22c55e', logo: '維', pos: { x: 6, y: 6 }, detail: '『身を切る改革』を掲げ、徹底した行財政改革を訴えています。経済政策の大きな特徴は、社会保険料の引き下げです。これにより、現役世代の『手取り』を増やし、経済を活性化させることを目指します。安全保障や憲法改正については、自民党に近い改革保守の立場です。教育の無償化や国の統治機構改革などを盛り込んだ、独自の憲法改正案を提示し、議論をリードしたい考えです。エネルギー政策では、安定した電力供給のため、原子力発電所の早期再稼働を支持しています。'},
+            kokumin: { name: '国民民主党', shortName: '国民', color: '#0ea5e9', logo: '国', pos: { x: 5, y: 5 }, detail: '『対決より解決』を掲げ、政策提案型の姿勢をアピールしています。『給料が上がる経済』の実現を最優先課題とし、消費税を時限的に5%へ引き下げるなど、家計の負担を軽くするための具体的な減税策を提案しています。また、子育て支援の財源として、使い道を教育に限定した『教育国債』の発行を主張しているのも特徴です。安全保障については現実的な路線をとり、エネルギー政策では、電力の安定供給のため、原発の再稼働や建て替え、新設も支持しています。'},
+            kyosan: { name: '日本共産党', shortName: '共産', color: '#dc2626', logo: '共', pos: { x: -8, y: -8 }, detail: '大企業や富裕層への課税を強化することで財源を生み出し、社会保障を充実させるべきだと主張しています。経済政策では、消費税を緊急で5%に引き下げ、将来的には廃止することを目指しています。平和主義の立場を鮮明にしており、憲法9条の改正や防衛費の増額には断固として反対しています。日米安全保障条約に頼らない、独自の平和外交を掲げています。エネルギー政策では、原発の危険性を訴え、『即時原発ゼロ』を要求しています。' },
+            reiwa: { name: 'れいわ新選組', shortName: 'れいわ', color: '#f97316', logo: 'れ', pos: { x: -9, y: -7 }, detail: '大胆な経済政策で、デフレからの完全脱却を目指します。『積極財政』を掲げ、消費税は即時廃止、さらに季節ごとに全国民へ10万円を給付するなど、国が大規模な財政出動を行うべきだと訴えています。その財源は、国債発行で賄うとしています。現行憲法の価値を重視し、憲法改正の動きには反対の立場です。防衛力の強化よりも、外交努力を尽くす『徹底した専守防衛』を主張しています。エネルギー政策では、原発は即時廃止し、国が管理して廃炉を進めるべきだとしています。' },
+            shamin: { name: '社会民主党', shortName: '社民', color: '#ec4899', logo: '社', pos: { x: -7, y: -9 }, detail: '憲法9条の理念を活かした平和外交を基本とし、軍拡に明確に反対しています。政策の最優先課題は、格差の是正と社会保障の充実です。例えば、誰もが安心して暮らせるよう、月額10万円の最低保障年金の実現などを掲げています。エネルギー政策では、脱原発を明確にし、2030年までに原発をゼロにすることを目指します。また、ジェンダー平等の実現を強く推進し、選択的夫婦別姓など、多様性を認める社会づくりを訴えています。' },
+            sansei: { name: '参政党', shortName: '参政', color: '#f59e0b', logo: '参', pos: { x: 7, y: 8 }, detail: '『教育・食と健康・国のまもり』を重点政策に掲げ、国民参加の政治を訴えています。改憲ではなく国民自身による『創憲』を提唱するのが特徴です。経済政策では、消費税の段階的な廃止や子供一人あたり月10万円の給付を掲げます。外国人労働者の受け入れは抑制し、国の舵取りに外国勢力が関与できない体制づくりや、化学物質に頼らない食と健康の実現などを訴えています。'},
+            hoshu: { name: '日本保守党', shortName: '日本保守党', shortName: '保守', color: '#1e40af', logo: '保', pos: { x: 8, y: 9 }, detail: '『日本を豊かに、強く。』をスローガンに、日本の伝統や文化を重視する立場です。食料品の消費税ゼロや再エネ賦課金の廃止など、具体的な減税策を掲げる。移民政策の是正も強く訴えます。憲法9条の改正を含め、国の防衛力を強化するための法整備に積極的です。'},
+        };
+
+        const policies = {
+            economy: {
+                name: '経済',
+                icon: '💰',
+                issues: {
+                    '物価高対策': { jimin: '給付と減税', komei: '給付と減税', rikken: '減税中心(食料品)', ishin: '減税中心(社会保険料)', kokumin: '減税中心(所得・消費)', kyosan: '減税中心(消費)', reiwa: '減税・給付', shamin: '減税中心(消費)', sansei: '減税・給付', hoshu: '減税中心(食料品)' },
+                    '消費税': { jimin: '維持', komei: '軽減税率維持', rikken: '時限的に食料品0%', ishin: '時限的撤廃提案', kokumin: '時限的に5%へ', kyosan: '5%へ減税→廃止', reiwa: '即時廃止', shamin: '食料品即時0%', sansei: '段階的に廃止', hoshu: '食料品ゼロ' },
+                    '財政政策': { jimin: '財政規律重視', komei: '財政規律重視', rikken: '基金取り崩し', ishin: '歳出改革', kokumin: '教育国債発行', kyosan: '富裕層・大企業増税', reiwa: '積極財政(通貨発行)', shamin: '富裕層・大企業増税', sansei: '独自通貨構想', hoshu: '減税・歳出改革' }
+                }
+            },
+            security: {
+                name: '安全保障',
+                icon: '🛡️',
+                issues: {
+                    '憲法改正 (9条)': { jimin: '積極的推進', komei: '慎重(加憲)', rikken: '慎重', ishin: '積極的推進', kokumin: '積極的推進', kyosan: '断固反対', reiwa: '断固反対', shamin: '断固反対', sansei: '創憲(新憲法制定)', hoshu: '積極的推進' },
+                    '防衛費': { jimin: '大幅増額', komei: '増額容認', rikken: '再評価・待遇改善優先', ishin: '増額容認', kokumin: '増額容認', kyosan: '断固反対', reiwa: '断固反対', shamin: '断固反対', sansei: '増額容認', hoshu: '増額容認' }
+                }
+            },
+            energy: {
+                name: 'エネルギー',
+                icon: '⚡',
+                issues: {
+                    '原子力発電': { jimin: '新増設・再稼働推進', komei: '再稼働容認・将来脱原発', rikken: '2050年までにゼロ', ishin: '再稼働推進', kokumin: '新増設・再稼働推進', kyosan: '即時ゼロ', reiwa: '即時廃止', shamin: '2030年までにゼロ', sansei: '新型炉へ移行', hoshu: '活用推進' }
+                }
+            },
+            society: {
+                name: '社会・多様性',
+                icon: '🌍',
+                issues: {
+                    '外国人政策': { jimin: '管理強化と受入推進', komei: '多文化共生', rikken: '権利保障・共生', ishin: '不明', kokumin: '管理強化・国益重視', kyosan: '権利保障・共生', reiwa: '移民政策反対・人権擁護', shamin: '権利保障・共生', sansei: '受入抑制・厳格化', hoshu: '移民政策是正' },
+                    '選択的夫婦別姓': { jimin: '慎重', komei: '推進', rikken: '積極的推進', ishin: '推進', kokumin: '推進', kyosan: '推進', reiwa: '推進', shamin: '推進', sansei: '慎重', hoshu: '反対' }
+                }
+            }
+        };
+
+        let politicalSpectrumChart;
+        let activeTab = 'economy';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTabs();
+            renderPolicyContent();
+            renderChart();
+            setupModal();
+        });
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabs-container');
+            tabsContainer.innerHTML = Object.keys(policies).map(key => `
+                <button class="tab-button ${key === activeTab ? 'active' : 'bg-white hover:bg-slate-100'} px-4 py-2 rounded-lg font-semibold text-slate-700 shadow-sm border border-slate-200" data-tab="${key}">
+                    ${policies[key].icon} ${policies[key].name}
+                </button>
+            `).join('');
+
+            tabsContainer.addEventListener('click', e => {
+                if (e.target.closest('.tab-button')) {
+                    const tabKey = e.target.closest('.tab-button').dataset.tab;
+                    activeTab = tabKey;
+                    renderTabs();
+                    renderPolicyContent();
+                }
+            });
+        }
+        
+        function renderPolicyContent() {
+            const container = document.getElementById('policy-content-container');
+            const policyCat = policies[activeTab];
+            let partyHeaders = Object.keys(partyData).map(pKey => `
+                <div class="policy-grid-party-header flex flex-col items-center gap-1 cursor-pointer" data-party-id="${pKey}">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg" style="background-color: ${partyData[pKey].color};">${partyData[pKey].logo}</div>
+                    <span class="text-xs text-slate-600 font-semibold">${partyData[pKey].shortName}</span>
+                </div>`).join('');
+
+            let issuesHTML = Object.keys(policyCat.issues).map(issueName => {
+                let stancesHTML = Object.keys(partyData).map(pKey => `
+                    <p class="text-center text-xs sm:text-sm text-slate-700 min-h-[4rem] flex items-center justify-center">${policyCat.issues[issueName][pKey] || 'N/A'}</p>
+                `).join('');
+
+                return `
+                    <div class="contents">
+                        <div class="p-3 bg-slate-100 rounded-l-lg flex items-center">
+                            <h4 class="font-semibold text-sm sm:text-base text-slate-800">${issueName}</h4>
+                        </div>
+                        ${stancesHTML}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="grid" style="grid-template-columns: 2fr repeat(${Object.keys(partyData).length}, 1fr); gap: 4px; padding: 16px;">
+                        <div></div> <!-- Empty corner cell -->
+                        ${partyHeaders}
+                        ${issuesHTML}
+                    </div>
+                </div>
+            `;
+            
+            container.querySelectorAll('.policy-grid-party-header').forEach(el => {
+                el.addEventListener('click', () => openModal(el.dataset.partyId));
+            });
+        }
+        
+        function renderChart() {
+            const ctx = document.getElementById('politicalSpectrumChart').getContext('2d');
+            const chartData = {
+                datasets: Object.keys(partyData).map(pKey => ({
+                    label: partyData[pKey].name,
+                    data: [partyData[pKey].pos],
+                    backgroundColor: partyData[pKey].color,
+                    borderColor: partyData[pKey].color,
+                    pointRadius: 10,
+                    pointHoverRadius: 15,
+                }))
+            };
+
+            politicalSpectrumChart = new Chart(ctx, {
+                type: 'scatter',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const pKey = Object.keys(partyData)[elements[0].datasetIndex];
+                            highlightParty(pKey);
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label;
+                                }
+                            },
+                            backgroundColor: '#1e293b',
+                            titleFont: { size: 0 },
+                            bodyFont: { size: 14, weight: 'bold' },
+                            padding: 12,
+                            cornerRadius: 6,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: -10, max: 10,
+                            grid: {
+                                color: '#e2e8f0' // slate-200
+                            },
+                            ticks: { display: false },
+                            title: {
+                                display: true,
+                                text: '◀ 護憲・平和主義  |  改憲・現実主義 ▶',
+                                font: { size: 14, weight: 'bold' },
+                                color: '#475569' // slate-600
+                            }
+                        },
+                        y: {
+                            min: -10, max: 10,
+                            grid: {
+                                color: '#e2e8f0' // slate-200
+                            },
+                             ticks: { display: false },
+                            title: {
+                                display: true,
+                                text: '◀ 積極財政  |  財政規律 ▶',
+                                font: { size: 14, weight: 'bold' },
+                                color: '#475569' // slate-600
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function highlightParty(partyId) {
+            document.querySelectorAll('.policy-grid-party-header').forEach(el => {
+                el.classList.remove('highlight');
+                if(el.dataset.partyId === partyId) {
+                    el.classList.add('highlight');
+                }
+            });
+        }
+
+        function openModal(partyId) {
+            const modal = document.getElementById('party-modal');
+            const modalContent = document.getElementById('modal-content');
+            const party = partyData[partyId];
+
+            modalContent.innerHTML = `
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-3xl mr-4 flex-shrink-0" style="background-color: ${party.color};">${party.logo}</div>
+                    <h2 class="text-3xl font-bold text-slate-900">${party.name}</h2>
+                </div>
+                <p class="text-slate-600 leading-relaxed">${party.detail}</p>
+            `;
+            modal.classList.add('is-open');
+            setTimeout(() => {
+                modal.querySelector('div').classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('party-modal');
+             modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.remove('is-open');
+            }, 300);
+        }
+
+        function setupModal() {
+            const modal = document.getElementById('party-modal');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+                    closeModal();
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>
