@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年参院選 各党政策インフォグラフィック</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .party-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .party-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .policy-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .modal {
+            display: none;
+        }
+        .modal.is-open {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="bg-white shadow-md">
+        <div class="container mx-auto px-4 py-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-800 text-center">2025年参院選 各党政策ウォッチ</h1>
+            <p class="text-center text-gray-600 mt-2">インフォグラフィックスで見る、主要政党の政策比較</p>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 政党選択エリア -->
+        <div id="party-cards-container" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-4 mb-12">
+            <!-- JavaScriptで政党カードを生成 -->
+        </div>
+
+        <!-- 政策比較エリア -->
+        <div id="policy-comparison-container">
+            <!-- JavaScriptで政策比較セクションを生成 -->
+        </div>
+    </main>
+
+    <!-- モーダル -->
+    <div id="policy-modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div id="modal-content" class="p-6">
+                <!-- モーダルの中身はJavaScriptで生成 -->
+            </div>
+            <div class="bg-gray-100 px-6 py-3 text-right">
+                <button id="modal-close-btn" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- データ定義 ---
+        const parties = [
+            { id: 'jimin', name: '自由民主党', shortName: '自民', color: '#ef4444', logo: '自' },
+            { id: 'komei', name: '公明党', shortName: '公明', color: '#3b82f6', logo: '公' },
+            { id: 'rikken', name: '立憲民主党', shortName: '立憲', color: '#2563eb', logo: '立' },
+            { id: 'ishin', name: '日本維新の会', shortName: '維新', color: '#22c55e', logo: '維' },
+            { id: 'kokumin', name: '国民民主党', shortName: '国民', color: '#0ea5e9', logo: '国' },
+            { id: 'kyosan', name: '日本共産党', shortName: '共産', color: '#dc2626', logo: '共' },
+            { id: 'reiwa', name: 'れいわ新選組', shortName: 'れいわ', color: '#f97316', logo: 'れ' },
+            { id: 'shamin', name: '社会民主党', shortName: '社民', color: '#ec4899', logo: '社' },
+            { id: 'sansei', name: '参政党', shortName: '参政', color: '#f59e0b', logo: '参' },
+            { id: 'hoshu', name: '日本保守党', shortName: '保守', color: '#1e40af', logo: '保' }
+        ];
+
+        const policies = {
+            economy: {
+                title: '経済政策',
+                issues: [
+                    {
+                        title: '物価高対策',
+                        stances: {
+                            jimin: '給付と減税',
+                            komei: '給付と減税',
+                            rikken: '減税中心(食料品)',
+                            ishin: '減税中心(社会保険料)',
+                            kokumin: '減税中心(所得・消費)',
+                            kyosan: '減税中心(消費)',
+                            reiwa: '減税・給付',
+                            shamin: '減税中心(消費)',
+                            sansei: '減税・給付',
+                            hoshu: '減税中心(食料品)'
+                        }
+                    },
+                    {
+                        title: '消費税',
+                        stances: {
+                            jimin: '維持',
+                            komei: '軽減税率維持',
+                            rikken: '時限的に食料品0%',
+                            ishin: '時限的撤廃提案',
+                            kokumin: '時限的に5%へ',
+                            kyosan: '5%へ減税→廃止',
+                            reiwa: '即時廃止',
+                            shamin: '食料品即時0%',
+                            sansei: '段階的に廃止',
+                            hoshu: '食料品ゼロ'
+                        }
+                    },
+                     {
+                        title: '財政政策',
+                        stances: {
+                            jimin: '財政規律重視',
+                            komei: '財政規律重視',
+                            rikken: '基金取り崩し',
+                            ishin: '歳出改革',
+                            kokumin: '教育国債発行',
+                            kyosan: '富裕層・大企業増税',
+                            reiwa: '積極財政(通貨発行)',
+                            shamin: '富裕層・大企業増税',
+                            sansei: '独自通貨構想',
+                            hoshu: '減税・歳出改革'
+                        }
+                    }
+                ]
+            },
+            security: {
+                title: '憲法・安全保障',
+                issues: [
+                    {
+                        title: '憲法改正 (9条)',
+                        stances: {
+                            jimin: '積極的推進',
+                            komei: '慎重(加憲)',
+                            rikken: '慎重',
+                            ishin: '積極的推進',
+                            kokumin: '積極的推進',
+                            kyosan: '断固反対',
+                            reiwa: '断固反対',
+                            shamin: '断固反対',
+                            sansei: '創憲(新憲法制定)',
+                            hoshu: '積極的推進'
+                        }
+                    },
+                    {
+                        title: '防衛費',
+                        stances: {
+                            jimin: '大幅増額',
+                            komei: '増額容認',
+                            rikken: '再評価・待遇改善優先',
+                            ishin: '増額容認',
+                            kokumin: '増額容認',
+                            kyosan: '断固反対',
+                            reiwa: '断固反対',
+                            shamin: '断固反対',
+                            sansei: '増額容認',
+                            hoshu: '増額容認'
+                        }
+                    }
+                ]
+            },
+            energy: {
+                title: 'エネルギー政策',
+                issues: [
+                    {
+                        title: '原子力発電',
+                        stances: {
+                            jimin: '新増設・再稼働推進',
+                            komei: '再稼働容認・将来脱原発',
+                            rikken: '2050年までにゼロ',
+                            ishin: '再稼働推進',
+                            kokumin: '新増設・再稼働推進',
+                            kyosan: '即時ゼロ',
+                            reiwa: '即時廃止',
+                            shamin: '2030年までにゼロ',
+                            sansei: '新型炉へ移行',
+                            hoshu: '活用推進'
+                        }
+                    }
+                ]
+            },
+            society: {
+                title: '社会・多様性',
+                issues: [
+                    {
+                        title: '外国人政策',
+                        stances: {
+                            jimin: '管理強化と受入推進',
+                            komei: '多文化共生',
+                            rikken: '権利保障・共生',
+                            ishin: '不明',
+                            kokumin: '管理強化・国益重視',
+                            kyosan: '権利保障・共生',
+                            reiwa: '移民政策反対・人権擁護',
+                            shamin: '権利保障・共生',
+                            sansei: '受入抑制・厳格化',
+                            hoshu: '移民政策是正'
+                        }
+                    },
+                    {
+                        title: '選択的夫婦別姓',
+                        stances: {
+                            jimin: '慎重',
+                            komei: '推進',
+                            rikken: '積極的推進',
+                            ishin: '推進',
+                            kokumin: '推進',
+                            kyosan: '推進',
+                            reiwa: '推進',
+                            shamin: '推進',
+                            sansei: '慎重',
+                            hoshu: '反対'
+                        }
+                    }
+                ]
+            }
+        };
+        
+        const partyDetails = {
+            jimin: {
+                summary: '財政規律を重視しつつ、経済成長による賃上げを目指す。安全保障面では防衛力を大幅に強化し、憲法改正に積極的。原子力発電の活用も推進する現実主義的保守の立場。',
+                points: [
+                    '物価高対策：給付と減税の組み合わせで対応',
+                    '憲法改正：9条改正を含め、議論を主導',
+                    '防衛費：GDP比2%を念頭に大幅増額',
+                    'エネルギー：原発の最大限の活用と次世代炉開発'
+                ]
+            },
+            komei: {
+                summary: '連立与党として自民党と基本路線を共有しつつ、生活者目線を重視。福祉政策や平和外交に強み。自民党の急進的な動きに対する「ブレーキ役」を自任する。',
+                points: [
+                    '物価高対策：即効性のある給付を重視し、減税と組み合わせる',
+                    '憲法改正：9条改正には慎重な「加憲」の立場',
+                    'エネルギー：原発依存度を低減し、将来的な脱原発を目指す',
+                    '社会政策：選択的夫婦別姓の導入に前向き'
+                ]
+            },
+            rikken: {
+                summary: '「生活安全保障」を掲げ、物価高対策として消費税減税を主張。現政権との対決姿勢を明確にし、立憲主義・平和主義を重視。脱原発と再生可能エネルギーへの転換を訴える。',
+                points: [
+                    '消費税：時限的に食料品を0%に',
+                    '憲法改正：9条改正には慎重、議論の優先順位は低い',
+                    '防衛費：増額ありきではなく、必要性や財源を精査',
+                    'エネルギー：2050年までの原発ゼロ社会を目指す'
+                ]
+            },
+            ishin: {
+                summary: '「身を切る改革」を掲げ、行財政改革を徹底。規制緩和による経済成長を重視し、社会保険料の引き下げを公約の柱に据える。安全保障や憲法改正では自民党に近い改革保守の立場。',
+                points: [
+                    '経済政策：社会保険料の引き下げで「手取り」を増やす',
+                    '憲法改正：教育無償化や統治機構改革など独自の改正案を提示',
+                    'エネルギー：原発の早期再稼働を支持',
+                    '社会保障：歳出削減策を具体的に提示'
+                ]
+            },
+            kokumin: {
+                summary: '「給料が上がる経済」の実現を最優先し、「対決より解決」を掲げる政策提案型。減税と社会保険料軽減で可処分所得を増やすことを目指す。安全保障では現実路線をとる。',
+                points: [
+                    '経済政策：消費税率5%への時限的引き下げを主張',
+                    '財源：子育て支援のため「教育国債」の発行を提唱',
+                    'エネルギー：原発の再稼働、リプレース、新増設を支持',
+                    '賃上げ：エッセンシャルワーカーへの的を絞った賃上げも提案'
+                ]
+            },
+            kyosan: {
+                summary: '大企業・富裕層への課税強化で財源を確保し、社会保障の拡充を目指す。消費税減税を強く主張。憲法9条を守り、日米安保条約の廃棄を掲げるなど、平和主義を貫く。',
+                points: [
+                    '消費税：5%への緊急減税と将来的な廃止を目指す',
+                    '財源：大企業の内部留保への時限的課税などを提案',
+                    '憲法・安保：9条改憲、防衛費増額に断固反対',
+                    'エネルギー：「即時原発ゼロ」を要求'
+                ]
+            },
+            reiwa: {
+                summary: '「積極財政」を掲げ、デフレ脱却まで消費税廃止と大胆な財政出動を訴える。徹底した反緊縮・反新自由主義の立場。現行憲法の遵守を強く主張する。',
+                points: [
+                    '経済政策：消費税は即時廃止、季節ごとの10万円給付',
+                    '財政政策：MMT（現代貨幣理論）に基づき、国債発行を積極的に活用',
+                    '憲法・安保：改憲論議に反対、徹底した専守防衛を主張',
+                    'エネルギー：原発は即時廃止し、国有化'
+                ]
+            },
+            shamin: {
+                summary: '憲法9条を活かした平和外交を基本とし、軍拡に明確に反対。社会保障の充実と格差是正を最優先課題とし、脱原発と自然エネルギーへの転換を求める。',
+                points: [
+                    '憲法・安保：護憲、防衛費増額に反対',
+                    '社会保障：月額10万円の最低保障年金実現を掲げる',
+                    'エネルギー：2030年までの原発ゼロを目指す',
+                    '社会政策：ジェンダー平等の実現を強く推進'
+                ]
+            },
+            sansei: {
+                summary: '「教育・食と健康・国のまもり」を重点政策に掲げる。既存政党とは一線を画し、国民参加の政治を訴える。改憲ではなく国民自身による「創憲」を提唱するのが特徴。',
+                points: [
+                    '経済政策：消費税の段階的廃止、子供一人あたり月10万円給付',
+                    '憲法改正：「改憲」ではなく、国民が主体となる「創憲」を主張',
+                    '外国人政策：外国人労働者の増加を抑制し、国の舵取りに外国勢力が関与できない体制を構築',
+                    '食と健康：化学物質に依存しない食と医療の実現を目指す'
+                ]
+            },
+            hoshu: {
+                summary: '「日本を豊かに、強く。」をスローガンに、伝統的な価値観を重視。食料品の消費税ゼロや再エネ賦課金の廃止など、具体的な減税策を掲げる。移民政策の是正も強く訴える。',
+                points: [
+                    '経済政策：酒類を含む食料品の消費税を恒久的にゼロに',
+                    'エネルギー：再エネ賦課金を廃止し、行き過ぎた再エネ政策を見直し',
+                    '憲法改正：憲法9条改正を含め、国防力強化のための法整備を推進',
+                    '外国人政策：入管難民法の改正と運用の厳正化を主張'
+                ]
+            }
+        };
+
+        // --- DOM要素 ---
+        const partyCardsContainer = document.getElementById('party-cards-container');
+        const policyContainer = document.getElementById('policy-comparison-container');
+        const modal = document.getElementById('policy-modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        // --- 関数 ---
+
+        // 政党カードを生成
+        function createPartyCards() {
+            parties.forEach(party => {
+                const card = document.createElement('div');
+                card.className = 'party-card cursor-pointer text-center p-4 bg-white rounded-lg shadow';
+                card.dataset.partyId = party.id;
+                card.innerHTML = `
+                    <div class="policy-icon mx-auto text-white" style="background-color: ${party.color};">
+                        ${party.logo}
+                    </div>
+                    <p class="mt-2 font-semibold text-sm text-gray-700">${party.name}</p>
+                `;
+                card.addEventListener('click', () => openModal(party.id));
+                partyCardsContainer.appendChild(card);
+            });
+        }
+
+        // 政策比較セクションを生成
+        function createPolicyComparison() {
+            for (const categoryKey in policies) {
+                const category = policies[categoryKey];
+                const section = document.createElement('section');
+                section.className = 'mb-12';
+                section.innerHTML = `<h2 class="text-2xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 mb-6">${category.title}</h2>`;
+
+                const grid = document.createElement('div');
+                grid.className = 'space-y-6';
+
+                category.issues.forEach(issue => {
+                    const issueDiv = document.createElement('div');
+                    issueDiv.className = 'bg-white p-4 rounded-lg shadow';
+                    
+                    let issueHTML = `<h3 class="text-lg font-semibold mb-4 text-gray-700">${issue.title}</h3>
+                                     <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 gap-4">`;
+
+                    parties.forEach(party => {
+                        const stance = issue.stances[party.id] || 'N/A';
+                        issueHTML += `
+                            <div class="text-center">
+                                <div class="policy-icon mx-auto text-white" style="background-color: ${party.color};">
+                                    ${party.logo}
+                                </div>
+                                <p class="mt-2 text-xs md:text-sm font-medium text-gray-600">${stance}</p>
+                            </div>
+                        `;
+                    });
+
+                    issueHTML += `</div>`;
+                    issueDiv.innerHTML = issueHTML;
+                    grid.appendChild(issueDiv);
+                });
+
+                section.appendChild(grid);
+                policyContainer.appendChild(section);
+            }
+        }
+        
+        // モーダルを開く
+        function openModal(partyId) {
+            const party = parties.find(p => p.id === partyId);
+            const details = partyDetails[partyId];
+            if (!party || !details) return;
+
+            let contentHTML = `
+                <div class="flex items-center mb-4">
+                    <div class="policy-icon text-white mr-4" style="background-color: ${party.color};">${party.logo}</div>
+                    <h2 class="text-2xl font-bold text-gray-800">${party.name}</h2>
+                </div>
+                <p class="text-gray-600 mb-6">${details.summary}</p>
+                <h3 class="text-lg font-semibold text-gray-700 mb-3">主な政策ポイント</h3>
+                <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    ${details.points.map(point => `<li>${point}</li>`).join('')}
+                </ul>
+            `;
+            
+            modalContent.innerHTML = contentHTML;
+            modal.classList.add('is-open');
+        }
+
+        // モーダルを閉じる
+        function closeModal() {
+            modal.classList.remove('is-open');
+        }
+
+        // --- イベントリスナー ---
+        modalCloseBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // --- 初期化 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            createPartyCards();
+            createPolicyComparison();
+        });
+    </script>
+</body>
+</html>
