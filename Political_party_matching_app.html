@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>政策スライダーマッチングアプリ - 2025年参院選</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .slider-track {
+            background: linear-gradient(to right, #ef4444, #eab308, #22c55e);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #ffffff;
+            border: 2px solid #4f46e5; /* indigo-600 */
+            border-radius: 50%;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: #ffffff;
+            border: 2px solid #4f46e5;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #results-card {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-indigo-800">政策スライダーマッチング</h1>
+            <p class="text-slate-600 mt-2">あなたの考えに一番近い政党を見つけよう</p>
+        </header>
+
+        <main id="app-container" class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+            
+            <div id="quiz-section">
+                <p class="text-center text-slate-600 mb-8">
+                    各政策テーマについて、スライダーを動かしてあなたの考えに最も近い位置に合わせてください。
+                </p>
+                <div id="sliders-container" class="space-y-8">
+                    <!-- Sliders will be injected here by JavaScript -->
+                </div>
+                <div class="text-center mt-10">
+                    <button id="calculate-btn" class="bg-indigo-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-indigo-700 transition-colors duration-300 shadow-md">
+                        結果を見る
+                    </button>
+                </div>
+            </div>
+
+            <div id="results-section" class="hidden">
+                <div id="results-card" class="opacity-0 transform translate-y-5">
+                    <h2 class="text-2xl font-bold mb-2 text-center">診断結果</h2>
+                    <p class="text-slate-600 mb-6 text-center">あなたの考えに最も近いのは...</p>
+                    
+                    <div class="bg-indigo-50 border-2 border-indigo-200 p-6 rounded-lg text-center">
+                        <h3 id="matched-party-name" class="text-4xl font-extrabold text-indigo-700"></h3>
+                    </div>
+
+                    <div class="mt-8">
+                        <h4 class="text-xl font-bold mb-4">マッチした理由</h4>
+                        <div id="match-reasons" class="space-y-4">
+                            <!-- Match reasons will be injected here -->
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-10">
+                        <button id="restart-btn" class="bg-slate-500 text-white font-bold py-3 px-10 rounded-lg hover:bg-slate-600 transition-colors duration-300">
+                            もう一度診断する
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-8 text-sm text-slate-500">
+            <p>このアプリは公開情報に基づき作成されたものであり、特定の政党を支持するものではありません。</p>
+        </footer>
+    </div>
+
+    <script>
+        const appData = {
+            issues: [
+                {
+                    id: 'tax',
+                    title: '消費税',
+                    description: '物価高対策として消費税をどうすべきか。',
+                    minLabel: '即時・恒久的に廃止',
+                    maxLabel: '現状の10%を維持',
+                    min: 1, max: 5, default: 3
+                },
+                {
+                    id: 'finance',
+                    title: '減税や給付金の財源',
+                    description: '政策実現のお金をどこから持ってくるか。国債発行、富裕層への課税、行革など様々な考え方があります。',
+                    minLabel: '国債発行や富裕層課税',
+                    maxLabel: '行革や税収増で対応',
+                    min: 1, max: 5, default: 3
+                },
+                {
+                    id: 'nuclear',
+                    title: '原子力発電',
+                    description: '将来のエネルギー源として原子力をどう扱うか。',
+                    minLabel: '即時廃止',
+                    maxLabel: '新増設も含め推進',
+                    min: 1, max: 5, default: 3
+                },
+                {
+                    id: 'renewable',
+                    title: '再生可能エネルギー',
+                    description: '太陽光などのクリーンエネルギーをどう進めるか。',
+                    minLabel: '最優先で積極推進',
+                    maxLabel: '問題が多く、推進に批判的',
+                    min: 1, max: 5, default: 3
+                },
+                {
+                    id: 'constitution',
+                    title: '憲法改正',
+                    description: '9条改正や緊急事態条項の創設について。',
+                    minLabel: '断固反対',
+                    maxLabel: '積極的に推進',
+                    min: 1, max: 3, default: 2
+                }
+            ],
+            parties: [
+                {
+                    id: 'ldp', name: '自由民主党',
+                    scores: { tax: 5, finance: 5, nuclear: 4, renewable: 3, constitution: 3 },
+                    reasons: {
+                        tax: '「現状維持」を主張し、あなたの「財政規律を重視する」考えと近いです。',
+                        finance: '「税収の上振れ分を活用」する方針で、あなたの「行革や税収増で対応する」考えと近いです。',
+                        nuclear: '「再稼働を推進」する立場で、あなたの「原子力を活用する」考えと近いです。',
+                        renewable: '「バランスの取れた導入」を目指し、あなたの「現実的な推進」を求める考えと近いです。',
+                        constitution: '「改正を推進」する立場で、あなたの「改憲に前向きな」考えと一致します。'
+                    }
+                },
+                {
+                    id: 'komei', name: '公明党',
+                    scores: { tax: 4, finance: 5, nuclear: 3, renewable: 2, constitution: 2 },
+                    reasons: {
+                        tax: '「軽減税率を重視」し、あなたの「負担軽減と財政のバランスを求める」考えと近いです。',
+                        finance: '「税収増の還元」を掲げ、あなたの「行革や税収増で対応する」考えと近いです。',
+                        nuclear: '「再稼働に慎重容認」の立場で、あなたの「バランスを重視する」考えと近いです。',
+                        renewable: '「防災利用などを推進」し、あなたの「着実な推進」を求める考えと近いです。',
+                        constitution: '「慎重な姿勢」で、あなたの「現状を尊重する」考えと近いです。'
+                    }
+                },
+                {
+                    id: 'cdp', name: '立憲民主党',
+                    scores: { tax: 3, finance: 3, nuclear: 2, renewable: 1, constitution: 1 },
+                    reasons: {
+                        tax: '「食料品を時限的に0%」とし、あなたの「生活者目線の減税」を求める考えと近いです。',
+                        finance: '「既存基金の取り崩し」を財源とし、あなたの「新たな国債発行や増税に頼らない」考えと近いです。',
+                        nuclear: '「脱原発」を目指す立場で、あなたの「原子力に頼らない」考えと近いです。',
+                        renewable: '「再エネ100%」を目指し、あなたの「積極的な推進」を求める考えと一致します。',
+                        constitution: '「改憲に反対」の立場で、あなたの「現行憲法を重視する」考えと一致します。'
+                    }
+                },
+                {
+                    id: 'ishin', name: '日本維新の会',
+                    scores: { tax: 3, finance: 4, nuclear: 4, renewable: 2, constitution: 3 },
+                    reasons: {
+                        tax: '「食料品を時限的に0%」とし、あなたの「生活者目線の減税」を求める考えと近いです。',
+                        finance: '「身を切る改革」を財源とし、あなたの「まず行政改革で財源を確保する」考えと近いです。',
+                        nuclear: '「再稼働を推進」する立場で、あなたの「原子力を活用する」考えと近いです。',
+                        renewable: '「規制改革で推進」を目指し、あなたの「効率的な推進」を求める考えと近いです。',
+                        constitution: '「改正を推進」する立場で、あなたの「改憲に前向きな」考えと一致します。'
+                    }
+                },
+                {
+                    id: 'jcp', name: '日本共産党',
+                    scores: { tax: 2, finance: 1, nuclear: 1, renewable: 1, constitution: 1 },
+                    reasons: {
+                        tax: '「5%へ減税し将来的に廃止」を目指し、あなたの「大幅な減税」を求める考えと近いです。',
+                        finance: '「大企業・富裕層への課税強化」を掲げ、あなたの「国債発行や富裕層課税で財源を確保する」考えと一致します。',
+                        nuclear: '「即時廃止」を主張し、あなたの「脱原発を強く求める」考えと一致します。',
+                        renewable: '「再エネ100%」を目指し、あなたの「積極的な推進」を求める考えと一致します。',
+                        constitution: '「改憲に反対」の立場で、あなたの「現行憲法を重視する」考えと一致します。'
+                    }
+                },
+                {
+                    id: 'dpp', name: '国民民主党',
+                    scores: { tax: 2, finance: 2, nuclear: 5, renewable: 2, constitution: 3 },
+                    reasons: {
+                        tax: '「5%へ時限的に減税」を掲げ、あなたの「大幅な減税」を求める考えと近いです。',
+                        finance: '「積極財政」を掲げ、あなたの「国債発行も辞さず経済を成長させる」考えと近いです。',
+                        nuclear: '「新増設も推進」する立場で、あなたの「原子力を積極的に活用する」考えと一致します。',
+                        renewable: '「制度改革で推進」を目指し、あなたの「効率的な推進」を求める考えと近いです。',
+                        constitution: '「改正を推進」する立場で、あなたの「改憲に前向きな」考えと一致します。'
+                    }
+                },
+                {
+                    id: 'reiwa', name: 'れいわ新選組',
+                    scores: { tax: 1, finance: 1, nuclear: 1, renewable: 1, constitution: 1 },
+                    reasons: {
+                        tax: '「即時・恒久的に廃止」を掲げ、あなたの「消費税廃止」を求める考えと一致します。',
+                        finance: '「大企業・富裕層への課税強化」を掲げ、あなたの「国債発行や富裕層課税で財源を確保する」考えと一致します。',
+                        nuclear: '「即時廃止」を主張し、あなたの「脱原発を強く求める」考えと一致します。',
+                        renewable: '「積極推進」の立場で、あなたの「再エネを重視する」考えと一致します。',
+                        constitution: '「改憲に反対」の立場で、あなたの「現行憲法を重視する」考えと一致します。'
+                    }
+                },
+                {
+                    id: 'sdp', name: '社会民主党',
+                    scores: { tax: 2, finance: 1, nuclear: 2, renewable: 1, constitution: 1 },
+                    reasons: {
+                        tax: '「食料品0%・時限的に全品目0%」を掲げ、あなたの「大幅な減税」を求める考えと近いです。',
+                        finance: '「内部留保への課税」を掲げ、あなたの「国債発行や富裕層課税で財源を確保する」考えと一致します。',
+                        nuclear: '「原発ゼロ」を目指す立場で、あなたの「脱原発を求める」考えと近いです。',
+                        renewable: '「自然エネ100%」を目指し、あなたの「積極的な推進」を求める考えと一致します。',
+                        constitution: '「改憲に反対」の立場で、あなたの「現行憲法を重視する」考えと一致します。'
+                    }
+                },
+                {
+                    id: 'sansei', name: '参政党',
+                    scores: { tax: 1, finance: 2, nuclear: 3, renewable: 5, constitution: 3 },
+                    reasons: {
+                        tax: '「段階的に廃止」を掲げ、あなたの「消費税廃止」を求める考えと一致します。',
+                        finance: '「積極財政」を掲げ、あなたの「国債発行も辞さず経済を成長させる」考えと近いです。',
+                        nuclear: '「次世代炉に期待」する立場で、あなたの「バランスを重視する」考えと近いです。',
+                        renewable: '「メガソーラーに批判的」で、あなたの「現行の再エネ政策に懐疑的な」考えと一致します。',
+                        constitution: '「改正を推進」する立場で、あなたの「改憲に前向きな」考えと一致します。'
+                    }
+                },
+                {
+                    id: 'hoshu', name: '日本保守党',
+                    scores: { tax: 3, finance: 2, nuclear: 3, renewable: 5, constitution: 3 },
+                    reasons: {
+                        tax: '「食料品を恒久的に0%」とし、あなたの「生活者目線の減税」を求める考えと近いです。',
+                        finance: '「積極財政」を掲げ、あなたの「国債発行も辞さず経済を成長させる」考えと近いです。',
+                        nuclear: 'スタンスは不明確ですが、あなたの「バランスを重視する」考えと大きくは異なりません。',
+                        renewable: '「火力発電活用」を主張し、あなたの「現行の再エネ政策に懐疑的な」考えと一致します。',
+                        constitution: '「改正を推進」する立場で、あなたの「改憲に前向きな」考えと一致します。'
+                    }
+                }
+            ]
+        };
+
+        const slidersContainer = document.getElementById('sliders-container');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const quizSection = document.getElementById('quiz-section');
+        const resultsSection = document.getElementById('results-section');
+        const resultsCard = document.getElementById('results-card');
+        const matchedPartyName = document.getElementById('matched-party-name');
+        const matchReasons = document.getElementById('match-reasons');
+
+        function createSliders() {
+            appData.issues.forEach(issue => {
+                const sliderWrapper = document.createElement('div');
+                sliderWrapper.innerHTML = `
+                    <div class="mb-2">
+                        <h3 class="text-xl font-bold">${issue.title}</h3>
+                        <p class="text-sm text-slate-500">${issue.description}</p>
+                    </div>
+                    <input type="range" id="${issue.id}-slider" min="${issue.min}" max="${issue.max}" value="${issue.default}" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider-track">
+                    <div class="flex justify-between text-xs text-slate-600 mt-2 px-1">
+                        <span>${issue.minLabel}</span>
+                        <span>${issue.maxLabel}</span>
+                    </div>
+                `;
+                slidersContainer.appendChild(sliderWrapper);
+            });
+        }
+
+        function calculateMatch() {
+            const userAnswers = {};
+            appData.issues.forEach(issue => {
+                userAnswers[issue.id] = parseInt(document.getElementById(`${issue.id}-slider`).value);
+            });
+
+            let bestMatch = null;
+            let minDifference = Infinity;
+
+            appData.parties.forEach(party => {
+                let totalDifference = 0;
+                appData.issues.forEach(issue => {
+                    const partyScore = party.scores[issue.id];
+                    const userAnswer = userAnswers[issue.id];
+                    totalDifference += Math.abs(partyScore - userAnswer);
+                });
+
+                if (totalDifference < minDifference) {
+                    minDifference = totalDifference;
+                    bestMatch = party;
+                }
+            });
+
+            displayResults(bestMatch);
+        }
+
+        function displayResults(party) {
+            matchedPartyName.textContent = party.name;
+            
+            matchReasons.innerHTML = '';
+            appData.issues.forEach(issue => {
+                const reasonEl = document.createElement('div');
+                reasonEl.className = 'bg-slate-50 p-4 rounded-md border-l-4 border-indigo-300';
+                reasonEl.innerHTML = `
+                    <p class="font-semibold text-slate-800">${issue.title}</p>
+                    <p class="text-slate-600 text-sm mt-1">${party.reasons[issue.id]}</p>
+                `;
+                matchReasons.appendChild(reasonEl);
+            });
+
+            quizSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+            
+            setTimeout(() => {
+                resultsCard.classList.remove('opacity-0', 'translate-y-5');
+            }, 100);
+        }
+
+        function restartQuiz() {
+            resultsSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            resultsCard.classList.add('opacity-0', 'translate-y-5');
+            appData.issues.forEach(issue => {
+                document.getElementById(`${issue.id}-slider`).value = issue.default;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            createSliders();
+            calculateBtn.addEventListener('click', calculateMatch);
+            restartBtn.addEventListener('click', restartQuiz);
+        });
+    </script>
+</body>
+</html>
