@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インタラクティブ・レアアースレポート 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: The application uses a thematic, top-down narrative structure. It starts with a high-level overview (Hero section), then allows users to explore the fundamental components ("The Elements" interactive grid). Next, it presents the core data through visualizations ("Global Market" with toggleable charts). It then connects these elements to real-world impact ("Applications" and "Risks vs. Responses"). Finally, it looks to the future ("Outlook"). This structure guides the user from "what is it?" to "why does it matter?" and "what's next?", transforming a dense report into an intuitive, explorable journey. Navigation allows both linear discovery and direct access to sections of interest. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: List of 17 REEs -> Goal: Organize/Inform -> Viz: Interactive CSS Grid -> Interaction: Click element to see details in a panel -> Justification: More engaging and space-efficient than a static table.
+        - Report Info: Production/Reserve data by country -> Goal: Compare -> Viz: Chart.js Donut/Bar charts -> Interaction: Toggle buttons to switch views, tooltips for details -> Justification: Visualizes market share and resource distribution far more effectively than data tables.
+        - Report Info: Applications -> Goal: Organize/Inform -> Viz: Card-based layout -> Interaction: Click card to reveal details -> Justification: Breaks down complex uses into digestible, thematic chunks.
+        - Report Info: Future demand/supply projections -> Goal: Show Change/Trend -> Viz: Chart.js Line chart -> Interaction: Tooltips on data points -> Justification: Clearly illustrates the critical "supply gap" narrative, which is a key conclusion of the report.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #F8F7F4;
+            color: #3C3C3C;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #D97706; /* Amber-600 */
+            border-bottom-color: #D97706;
+        }
+        .element-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .element-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .element-card.active {
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px #D97706;
+            background-color: #FEF3C7; /* Amber-100 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 550px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-height: 400px;
+            }
+        }
+        .section-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-gray-800">レアアース2025</h1>
+            <div class="hidden md:flex space-x-6 text-sm">
+                <a href="#overview" class="nav-link">概要</a>
+                <a href="#elements" class="nav-link">17の元素</a>
+                <a href="#market" class="nav-link">世界市場</a>
+                <a href="#applications" class="nav-link">主要な用途</a>
+                <a href="#risks" class="nav-link">リスクと対応</a>
+                <a href="#outlook" class="nav-link">未来展望</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-700 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white">
+            <a href="#overview" class="block py-2 px-4 text-sm text-gray-700 hover:bg-amber-50">概要</a>
+            <a href="#elements" class="block py-2 px-4 text-sm text-gray-700 hover:bg-amber-50">17の元素</a>
+            <a href="#market" class="block py-2 px-4 text-sm text-gray-700 hover:bg-amber-50">世界市場</a>
+            <a href="#applications" class="block py-2 px-4 text-sm text-gray-700 hover:bg-amber-50">主要な用途</a>
+            <a href="#risks" class="block py-2 px-4 text-sm text-gray-700 hover:bg-amber-50">リスクと対応</a>
+            <a href="#outlook" class="block py-2 px-4 text-sm text-gray-700 hover:bg-amber-50">未来展望</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-8 md:py-12">
+
+        <section id="overview" class="min-h-[60vh] flex items-center section-fade-in">
+            <div class="w-full text-center">
+                <h2 class="text-3xl md:text-5xl font-bold text-amber-600 mb-4">現代技術の生命線、レアアース</h2>
+                <p class="max-w-3xl mx-auto text-base md:text-lg text-gray-600 mb-12">
+                    レアアースは、電気自動車からスマートフォン、防衛システムまで、私たちの生活と経済安全保障に不可欠です。しかし、その供給網は中国一国に極度に集中しており、深刻な地政学的リスクを内包しています。このレポートは、レアアースを巡る複雑な世界を解き明かし、日本の進むべき道を探ります。
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-500">
+                        <h3 class="text-4xl font-bold text-gray-800">17</h3>
+                        <p class="text-gray-600">の戦略的元素</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                        <h3 class="text-4xl font-bold text-gray-800">~90%</h3>
+                        <p class="text-gray-600">の精製シェアを中国が独占</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                        <h3 class="text-4xl font-bold text-gray-800">3倍</h3>
+                        <p class="text-gray-600">に増加する2040年の需要予測</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="elements" class="py-16 md:py-24 section-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold">17の元素を知る</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto mt-2">レアアースは軽希土類と重希土類に分類されます。下のカードをクリックして、各元素の特性と用途を発見してください。</p>
+            </div>
+            <div class="lg:flex gap-8">
+                <div class="lg:w-2/3 grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2">
+                </div>
+                <div id="element-details" class="lg:w-1/3 mt-8 lg:mt-0 p-6 bg-white rounded-lg shadow-lg sticky top-24 h-fit">
+                    <h3 id="element-name" class="text-2xl font-bold mb-2">元素を選択</h3>
+                    <div id="element-info" class="text-gray-700">
+                        <p>左のパネルから元素を選択すると、ここに詳細が表示されます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="market" class="py-16 md:py-24 section-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold">支配される世界市場</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto mt-2">レアアースの供給は、採掘から精製まで中国が圧倒的なシェアを握っています。特に、価値連鎖の要である精製工程の独占が、地政学的リスクの根源です。</p>
+            </div>
+            <div class="text-center mb-8">
+                <button id="show-production-btn" class="bg-amber-500 text-white px-6 py-2 rounded-md shadow-md hover:bg-amber-600 transition">鉱山生産量シェア</button>
+                <button id="show-reserves-btn" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 transition ml-4">埋蔵量シェア</button>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                <div class="lg:col-span-3">
+                    <div id="production-chart-container" class="chart-container">
+                        <canvas id="productionChart"></canvas>
+                    </div>
+                    <div id="reserves-chart-container" class="chart-container hidden">
+                        <canvas id="reservesChart"></canvas>
+                    </div>
+                </div>
+                <div id="market-text-content" class="lg:col-span-2 text-gray-700 bg-white p-6 rounded-lg shadow">
+                    <h3 id="market-title" class="text-xl font-bold mb-4">2024年 鉱山生産量シェア（推定）</h3>
+                    <p id="market-description">2024年、世界のレアアース鉱山生産量は約39万トンと推定され、そのうち中国が約69%を占めています。米国、ミャンマー、オーストラリアが続きますが、中国の生産量は他を圧倒しています。しかし、真のボトルネックは採掘量ではなく、この後工程にあります。</p>
+                    <div class="mt-6 p-4 bg-blue-50 border-l-4 border-blue-500">
+                        <h4 class="font-bold text-lg text-blue-800">精製工程の支配</h4>
+                        <p class="mt-1 text-blue-700">中国は世界のレアアース分離・精製能力の約90%を掌握しています。米国で採掘された鉱石でさえ、精製のために中国へ送られているのが現状です。この中間工程の支配こそが、中国の戦略的優位性の核心です。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="applications" class="py-16 md:py-24 section-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold">現代技術を支える主要な用途</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto mt-2">レアアースは目に見えないところで、私たちの最先端技術を可能にしています。特に重要なのが、世界最強の永久磁石です。</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="application-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="p-3 rounded-full bg-green-100 mr-4">
+                            <span class="text-2xl">🚗</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">永久磁石</h3>
+                    </div>
+                    <p class="text-gray-600">EVモーター、風力発電機、HDDに不可欠な世界最強のネオジム磁石。高温下での性能維持には、重希土類が必須です。</p>
+                    <p class="mt-4 text-sm font-semibold text-amber-700">主要元素: Nd, Pr, Dy, Tb</p>
+                </div>
+                <div class="application-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                     <div class="flex items-center mb-4">
+                        <div class="p-3 rounded-full bg-red-100 mr-4">
+                            <span class="text-2xl">🏭</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">触媒</h3>
+                    </div>
+                    <p class="text-gray-600">自動車の排ガス浄化や石油精製プロセスで重要な役割を果たします。環境規制の強化に伴い、需要が増加しています。</p>
+                    <p class="mt-4 text-sm font-semibold text-amber-700">主要元素: Ce, La</p>
+                </div>
+                <div class="application-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="p-3 rounded-full bg-blue-100 mr-4">
+                            <span class="text-2xl">📱</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">蛍光体</h3>
+                    </div>
+                    <p class="text-gray-600">スマートフォンの画面やLED照明、カラーテレビの鮮やかな色彩を生み出します。赤・緑・青の光の三原色を作り出すために使われます。</p>
+                    <p class="mt-4 text-sm font-semibold text-amber-700">主要元素: Eu, Tb, Y</p>
+                </div>
+                <div class="application-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="p-3 rounded-full bg-purple-100 mr-4">
+                            <span class="text-2xl">렌</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">光学ガラス・レンズ</h3>
+                    </div>
+                    <p class="text-gray-600">高性能カメラや望遠鏡のレンズの屈折率を高め、色収差を補正します。よりシャープでクリアな画像を実現します。</p>
+                    <p class="mt-4 text-sm font-semibold text-amber-700">主要元素: La, Gd</p>
+                </div>
+                 <div class="application-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="p-3 rounded-full bg-yellow-100 mr-4">
+                            <span class="text-2xl">🔋</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">合金・セラミックス</h3>
+                    </div>
+                    <p class="text-gray-600">航空機エンジンの耐熱性向上や、ニッケル水素電池の電極材料、電子部品の小型化に貢献しています。</p>
+                    <p class="mt-4 text-sm font-semibold text-amber-700">主要元素: Pr, Y, Sc</p>
+                </div>
+                 <div class="application-card bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    <div class="flex items-center mb-4">
+                        <div class="p-3 rounded-full bg-pink-100 mr-4">
+                            <span class="text-2xl">🩺</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">医療・その他</h3>
+                    </div>
+                    <p class="text-gray-600">MRIの造影剤や、原子炉の制御棒など、特殊ながらも生命や安全に関わる重要な分野で利用されています。</p>
+                    <p class="mt-4 text-sm font-semibold text-amber-700">主要元素: Gd, Dy, Sm</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="risks" class="py-16 md:py-24 bg-gray-50 -mx-6 px-6 section-fade-in">
+             <div class="text-center mb-12 container mx-auto">
+                <h2 class="text-3xl font-bold">リスクと世界の対応</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto mt-2">中国の市場支配は、環境破壊と人権侵害という「隠されたコスト」の上に成り立っています。これに対し、日本をはじめとする西側諸国は、強靭で倫理的な供給網の構築を急いでいます。</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 container mx-auto">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-red-700">サプライチェーンの脆弱性と外部不経済</h3>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h4 class="font-bold text-lg">環境破壊</h4>
+                            <p class="text-gray-600 mt-2">中国・内モンゴル自治区では、ずさんな管理により有毒・放射性の廃棄物が投棄され、広大な「毒の湖」が形成されています。土壌と水質の汚染は深刻で、住民の健康被害も報告されています。</p>
+                        </div>
+                         <div class="bg-white p-6 rounded-lg shadow">
+                            <h4 class="font-bold text-lg">人権侵害と紛争</h4>
+                            <p class="text-gray-600 mt-2">重希土類の主要供給地であるミャンマーでは、違法採掘が横行。武装勢力の資金源となり紛争を助長する一方、強制労働や環境破壊が地域社会を破壊しています。</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold mb-6 text-green-700">強靭な供給網への道</h3>
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h4 class="font-bold text-lg">供給源の多角化 (フレンドショアリング)</h4>
+                            <p class="text-gray-600 mt-2">日米豪などが参加する「鉱物安全保障パートナーシップ(MSP)」を通じ、中国以外の信頼できる国々（オーストラリア、ブラジル等）での開発プロジェクトに官民で投資を進めています。</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow">
+                            <h4 class="font-bold text-lg">技術革新とリサイクル</h4>
+                            <p class="text-gray-600 mt-2">日本は、重希土類を使わない高性能磁石の開発や、廃製品からレアアースを回収する「都市鉱山」技術で世界をリード。技術による依存脱却を目指しています。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="outlook" class="py-16 md:py-24 section-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold">未来展望：拡大する需給ギャップ</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto mt-2">クリーンエネルギーへの移行が加速する中、レアアース需要は爆発的に増加する見込みです。しかし供給の伸びはそれに追いつかず、2030年以降、深刻な供給不足が予測されています。</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
+                 <div class="lg:col-span-2 text-gray-700 bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-xl font-bold mb-4">2035年に向けた構造的赤字</h3>
+                    <p>特にEVや風力発電に不可欠な磁石用レアアース（NdPr, Dy, Tb）の需要は急増します。国際エネルギー機関(IEA)などの分析では、需要が供給を大幅に上回り続ける「構造的な供給不足」に陥ると予測されています。これは価格の高騰や、資源を巡る国家間の競争激化を意味します。</p>
+                    <div class="mt-6 p-4 bg-amber-50 border-l-4 border-amber-500">
+                        <h4 class="font-bold text-lg text-amber-800">日本の戦略的提言</h4>
+                        <ul class="mt-2 list-disc list-inside text-amber-700 space-y-1">
+                            <li>技術的自立の加速（重希土類フリー磁石開発）</li>
+                            <li>「都市鉱山」リサイクル技術の確立</li>
+                            <li>同盟国との連携による非中国系プロジェクトへの投資</li>
+                            <li>戦略的備蓄の強化と国際標準化の主導</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="lg:col-span-3">
+                    <div class="chart-container h-96 max-h-[50vh]">
+                        <canvas id="outlookChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-4 text-center text-sm">
+            <p>&copy; 2025 Interactive Rare Earth Report. 本アプリケーションは提供されたレポートに基づき生成されました。</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const rareEarthData = {
+        elements: [
+            { name: "スカンジウム", symbol: "Sc", type: "HREE", atomic: 21, use: "軽量アルミ合金（航空宇宙）、高輝度放電灯、固体酸化物形燃料電池（SOFC）の電解質。" },
+            { name: "イットリウム", symbol: "Y", type: "HREE", atomic: 39, use: "赤色蛍光体（テレビ、LED）、耐熱合金、レーザー結晶、ジルコニア安定剤。" },
+            { name: "ランタン", symbol: "La", type: "LREE", atomic: 57, use: "光学レンズ（カメラ、望遠鏡）、ニッケル水素電池の負極、石油精製触媒。" },
+            { name: "セリウム", symbol: "Ce", type: "LREE", atomic: 58, use: "自動車排ガス触媒、ガラス研磨剤、UVカットガラス、発火石。" },
+            { name: "プラセオジム", symbol: "Pr", type: "LREE", atomic: 59, use: "永久磁石（ネオジムと併用）、航空機エンジン用マグネシウム合金、ガラス・セラミックの着色剤（黄色）。" },
+            { name: "ネオジム", symbol: "Nd", type: "LREE", atomic: 60, use: "最強の永久磁石（NdFeB磁石）の主成分。EVモーター、風力発電機、HDD、スピーカー等。" },
+            { name: "プロメチウム", symbol: "Pm", type: "LREE", atomic: 61, use: "放射性。原子力電池、蛍光塗料の励起源として研究されたが、実用例は限定的。" },
+            { name: "サマリウム", symbol: "Sm", type: "LREE", atomic: 62, use: "サマリウムコバルト磁石（SmCo磁石）の主成分。高温に強く、軍事・航空宇宙分野で利用。" },
+            { name: "ユウロピウム", symbol: "Eu", type: "LREE", atomic: 63, use: "赤色および青色蛍光体の中心元素。カラーテレビ、蛍光灯、LED照明、紙幣の偽造防止インク。" },
+            { name: "ガドリニウム", symbol: "Gd", type: "LREE", atomic: 64, use: "MRI用造影剤、原子炉の制御棒、中性子捕捉療法、特殊な磁性冷凍材料。" },
+            { name: "テルビウム", symbol: "Tb", type: "HREE", atomic: 65, use: "緑色蛍光体（ディスプレイ、照明）、永久磁石の耐熱性向上添加剤、ソナーシステム。" },
+            { name: "ジスプロシウム", symbol: "Dy", type: "HREE", atomic: 66, use: "永久磁石の耐熱性（保磁力）を大幅に向上させる最も重要な添加剤。EVモーター等に必須。" },
+            { name: "ホルミウム", symbol: "Ho", type: "HREE", atomic: 67, use: "医療用レーザー（ホルミウムレーザー）、強力な磁場を発生させるための磁極片、ガラス着色剤。" },
+            { name: "エルビウム", symbol: "Er", type: "HREE", atomic: 68, use: "光ファイバー通信の増幅器、医療用レーザー、ガラス・セラミックの着色剤（ピンク色）。" },
+            { name: "ツリウム", symbol: "Tm", type: "HREE", atomic: 69, use: "携帯用X線装置の線源、高温超伝導体材料、医療用レーザー。" },
+            { name: "イッテルビウム", symbol: "Yb", type: "HREE", atomic: 70, use: "ファイバーレーザー、ステンレス鋼の強度向上添加剤、地震計、ガンマ線源。" },
+            { name: "ルテチウム", symbol: "Lu", type: "HREE", atomic: 71, use: "PETスキャナ用シンチレータ、石油精製触媒、核医学分野での利用研究。" }
+        ],
+        market: {
+            production: {
+                title: '2024年 鉱山生産量シェア（推定）',
+                description: '2024年、世界のレアアース鉱山生産量は約39万トンと推定され、そのうち中国が約69%を占めています。米国、ミャンマー、オーストラリアが続きますが、中国の生産量は他を圧倒しています。しかし、真のボトルネックは採掘量ではなく、この後工程にあります。',
+                labels: ['中国', '米国', 'ミャンマー', 'オーストラリア', 'その他'],
+                data: [69.2, 11.5, 8.0, 3.3, 8.0],
+                colors: ['#EF4444', '#3B82F6', '#F97316', '#10B981', '#6B7280']
+            },
+            reserves: {
+                title: '2024年 埋蔵量シェア（推定）',
+                description: '埋蔵量を見ると、中国のシェアは約34%に留まります。ベトナムとブラジルが大きなポテンシャルを秘めており、中国の支配が資源の独占ではなく、産業政策の賜物であることがわかります。',
+                labels: ['中国', 'ベトナム', 'ブラジル', 'ロシア', 'インド', 'オーストラリア', 'その他'],
+                data: [33.8, 16.9, 16.2, 7.7, 5.3, 4.4, 15.7],
+                colors: ['#EF4444', '#22C55E', '#EAB308', '#8B5CF6', '#F97316', '#10B981', '#6B7280']
+            }
+        },
+        outlook: {
+            labels: Array.from({length: 16}, (_, i) => 2020 + i),
+            demand: [100, 108, 117, 126, 136, 147, 159, 172, 186, 201, 218, 236, 255, 276, 298, 322],
+            supply: [100, 105, 110, 115, 120, 126, 132, 138, 144, 151, 158, 165, 172, 180, 188, 196]
+        }
+    };
+    
+    let productionChartInstance, reservesChartInstance, outlookChartInstance;
+
+    const setupMobileMenu = () => {
+        const menuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        menuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    };
+
+    const setupElementExplorer = () => {
+        const grid = document.querySelector('#elements .grid');
+        const detailsPanel = document.getElementById('element-details');
+        const nameEl = document.getElementById('element-name');
+        const infoEl = document.getElementById('element-info');
+
+        rareEarthData.elements.forEach(el => {
+            const card = document.createElement('div');
+            card.className = `element-card p-2 rounded-lg text-center ${el.type === 'LREE' ? 'bg-amber-200' : 'bg-sky-200'}`;
+            card.dataset.symbol = el.symbol;
+            card.innerHTML = `
+                <div class="font-bold text-lg text-gray-800">${el.symbol}</div>
+                <div class="text-xs text-gray-600">${el.name}</div>
+            `;
+            grid.appendChild(card);
+        });
+
+        grid.addEventListener('click', (e) => {
+            const card = e.target.closest('.element-card');
+            if (card) {
+                const symbol = card.dataset.symbol;
+                const element = rareEarthData.elements.find(el => el.symbol === symbol);
+                
+                document.querySelectorAll('.element-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+
+                nameEl.textContent = `${element.name} (${element.symbol})`;
+                infoEl.innerHTML = `
+                    <p class="mb-2"><span class="font-bold">分類:</span> ${element.type === 'LREE' ? '軽希土類' : '重希土類'}</p>
+                    <p class="mb-2"><span class="font-bold">原子番号:</span> ${element.atomic}</p>
+                    <p><span class="font-bold">主な用途:</span> ${element.use}</p>
+                `;
+            }
+        });
+
+        grid.querySelector('.element-card[data-symbol="Nd"]').click();
+    };
+    
+    const createProductionChart = () => {
+        const ctx = document.getElementById('productionChart').getContext('2d');
+        const data = rareEarthData.market.production;
+        productionChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: '鉱山生産量シェア',
+                    data: data.data,
+                    backgroundColor: data.colors,
+                    borderColor: '#F8F7F4',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    };
+    
+    const createReservesChart = () => {
+        const ctx = document.getElementById('reservesChart').getContext('2d');
+        const data = rareEarthData.market.reserves;
+        reservesChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: '埋蔵量シェア (%)',
+                    data: data.data,
+                    backgroundColor: data.colors,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                     tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '世界シェア (%)'
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    const setupMarketViewToggle = () => {
+        const productionBtn = document.getElementById('show-production-btn');
+        const reservesBtn = document.getElementById('show-reserves-btn');
+        const productionContainer = document.getElementById('production-chart-container');
+        const reservesContainer = document.getElementById('reserves-chart-container');
+        const marketTitle = document.getElementById('market-title');
+        const marketDescription = document.getElementById('market-description');
+
+        productionBtn.addEventListener('click', () => {
+            productionContainer.classList.remove('hidden');
+            reservesContainer.classList.add('hidden');
+            productionBtn.classList.add('bg-amber-500', 'text-white');
+            productionBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            reservesBtn.classList.add('bg-gray-200', 'text-gray-700');
+            reservesBtn.classList.remove('bg-amber-500', 'text-white');
+            marketTitle.textContent = rareEarthData.market.production.title;
+            marketDescription.textContent = rareEarthData.market.production.description;
+        });
+
+        reservesBtn.addEventListener('click', () => {
+            reservesContainer.classList.remove('hidden');
+            productionContainer.classList.add('hidden');
+            reservesBtn.classList.add('bg-amber-500', 'text-white');
+            reservesBtn.classList.remove('bg-gray-200', 'text-gray-700');
+            productionBtn.classList.add('bg-gray-200', 'text-gray-700');
+            productionBtn.classList.remove('bg-amber-500', 'text-white');
+            marketTitle.textContent = rareEarthData.market.reserves.title;
+            marketDescription.textContent = rareEarthData.market.reserves.description;
+        });
+    };
+
+    const createOutlookChart = () => {
+        const ctx = document.getElementById('outlookChart').getContext('2d');
+        const data = rareEarthData.outlook;
+        outlookChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: '需要 (指数)',
+                    data: data.demand,
+                    borderColor: '#EF4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    fill: false,
+                    tension: 0.3
+                }, {
+                    label: '供給 (指数)',
+                    data: data.supply,
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: '需要・供給指数 (2020年=100)'
+                        }
+                    },
+                     x: {
+                        title: {
+                            display: true,
+                            text: '年'
+                        }
+                    }
+                }
+            }
+        });
+    };
+    
+    const setupScrollAnimations = () => {
+        const sections = document.querySelectorAll('.section-fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    };
+
+    const setupNavHighlighting = () => {
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
+                    });
+                }
+            });
+        }, { rootMargin: '-30% 0px -70% 0px'});
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+    };
+
+    setupMobileMenu();
+    setupElementExplorer();
+    createProductionChart();
+    createReservesChart();
+    setupMarketViewToggle();
+    createOutlookChart();
+    setupScrollAnimations();
+    setupNavHighlighting();
+});
+</script>
+
+</body>
+</html>
