@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: レポートの情報を探索的に理解するため、単一ページのダッシュボード形式を採用。主要な指標をカードで提示し、中心にインタラクティブなグラフを配置。ユーザーはボタン操作で「総額推移」「給付内訳」「財源内訳」「対GDP比」の4つの視点を自由に切り替え可能。これにより、レポートの直線的な構成とは異なり、利用者が自身の関心に応じてデータを深掘りできる非線形な探索体験を提供する。グラフ下の解説文が連動して変わることで、可視化されたデータに文脈を与える。この構造は、複雑な時系列データの多角的な分析を促し、ユーザビリティを最大化するために選択された。 -->
+    <!-- Visualization & Content Choices: 
+        - [総額の比較] -> Goal: 給付と負担の構造的ギャップ（ワニの口）を可視化 -> Viz: 2本の線グラフ -> Interaction: ホバーで詳細表示 -> Justification: レポートの核心的な問題提起を最も直接的に示すため -> Library: Chart.js/Canvas
+        - [内訳の推移] -> Goal: 各項目の構成比の変化と全体の伸びを同時に示す -> Viz: 積み上げ棒グラフ -> Interaction: ホバー、凡例クリックで特定項目をハイライト -> Justification: 全体の中での各要素の寄与度を時系列で直感的に理解させるため -> Library: Chart.js/Canvas
+        - [対GDP比の推移] -> Goal: 経済規模に対する社会保障の重みを相対的に示す -> Viz: 線グラフ -> Interaction: ホバー -> Justification: 絶対額だけでは分からない経済的負担の変遷を明確にするため -> Library: Chart.js/Canvas
+        - [人口動態の文脈] -> Goal: 費用増大の根本原因を提示 -> Viz: 数値カードと簡単な解説文 -> Interaction: 静的表示 -> Justification: 複雑なグラフは不要と判断し、最も重要な指標を簡潔に提示するため -> Library: HTML/Tailwind
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>日本の社会保障制度：給付と負担の変遷（2000-2022年度）</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans JP', sans-serif; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .active-btn {
+            background-color: #1e40af;
+            color: #ffffff;
+        }
+        .inactive-btn {
+            background-color: #e5e7eb;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-800">日本の社会保障制度ダッシュボード</h1>
+            <p class="text-sm text-slate-600 mt-1">給付と負担の変遷（2000-2022年度）</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="intro" class="mb-8">
+            <h2 class="text-xl font-bold text-slate-700 mb-2">はじめに</h2>
+            <p class="text-slate-600 leading-relaxed">
+                このダッシュボードは、日本の社会保障財政が過去約20年間でどのように変化してきたかをインタラクティブに探るためのツールです。人口高齢化を背景に増大する「給付」と、それを支える「負担」の関係性は、日本の最重要課題の一つです。下のボタンでグラフを切り替え、様々な角度からデータの背後にある物語を読み解いてみましょう。
+            </p>
+        </section>
+
+        <section id="kpi" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-lg border border-slate-200">
+                <h3 class="text-sm font-medium text-slate-500">総給付費 (2022年度)</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-1">137.8<span class="text-lg ml-1">兆円</span></p>
+            </div>
+            <div class="bg-white p-5 rounded-lg border border-slate-200">
+                <h3 class="text-sm font-medium text-slate-500">国民負担率 (2022年度)</h3>
+                <p class="text-3xl font-bold text-red-600 mt-1">46.5<span class="text-lg ml-1">%</span></p>
+            </div>
+             <div class="bg-white p-5 rounded-lg border border-slate-200">
+                <h3 class="text-sm font-medium text-slate-500">高齢化率 (2024年)</h3>
+                <p class="text-3xl font-bold text-amber-600 mt-1">29.2<span class="text-lg ml-1">%</span></p>
+            </div>
+            <div class="bg-white p-5 rounded-lg border border-slate-200">
+                <h3 class="text-sm font-medium text-slate-500">対GDP比給付費 (2022)</h3>
+                <p class="text-3xl font-bold text-teal-600 mt-1">24.3<span class="text-lg ml-1">%</span></p>
+            </div>
+        </section>
+
+        <section id="interactive-chart" class="bg-white p-4 sm:p-6 rounded-lg border border-slate-200">
+            <h2 id="chart-title" class="text-xl font-bold text-slate-800 text-center mb-4"></h2>
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+                <button id="btn-total" class="px-4 py-2 text-sm font-medium rounded-md transition">総額の推移</button>
+                <button id="btn-benefits" class="px-4 py-2 text-sm font-medium rounded-md transition">給付内訳の推移</button>
+                <button id="btn-burdens" class="px-4 py-2 text-sm font-medium rounded-md transition">財源内訳の推移</button>
+                <button id="btn-gdp" class="px-4 py-2 text-sm font-medium rounded-md transition">対GDP比の推移</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+            <div id="chart-explanation" class="mt-6 text-sm text-slate-600 bg-slate-100 p-4 rounded-md leading-relaxed">
+                <p>上のボタンを選択して、表示するグラフを切り替えてください。</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-6">
+        <p class="text-xs text-slate-500">データ出典: 国立社会保障・人口問題研究所、内閣府、財務省等の公表データを基に作成。</p>
+    </footer>
+
+<script>
+    const reportData = {
+        years: [2000, 2005, 2010, 2015, 2020, 2021, 2022],
+        benefits: {
+            total: [78.1, 88.9, 105.1, 116.8, 130.0, 138.7, 137.8],
+            pension: [42.1, 47.9, 53.0, 55.2, 55.8, 55.8, 55.8],
+            medical: [25.4, 28.1, 32.9, 38.6, 42.6, 47.4, 48.8],
+            welfare: [10.6, 12.9, 19.1, 23.0, 31.6, 35.5, 33.3],
+        },
+        burdens: {
+            total: [88.5, 97.8, 110.8, 126.9, 154.2, 163.4, 153.0],
+            insurance: [50.1, 55.4, 60.1, 67.8, 72.8, 72.9, 77.3],
+            public: [29.8, 32.5, 40.2, 47.7, 67.1, 65.9, 64.2],
+            other: [8.6, 9.9, 10.5, 11.4, 14.3, 24.6, 11.5]
+        },
+        gdp: {
+            benefits_ratio: [14.2, 16.3, 20.2, 21.6, 24.3, 25.2, 24.3],
+            insurance_ratio: [9.1, 10.2, 11.6, 12.5, 13.6, 13.2, 13.6],
+            public_ratio: [5.4, 6.0, 7.7, 8.8, 12.6, 12.0, 11.3],
+        }
+    };
+
+    const textData = {
+        total: `
+            <h3 class="font-bold mb-2">解説：広がる「ワニの口」</h3>
+            <p>総給付費（青線）の伸びが、保険料と公費を主とする総財源（緑線）の伸びを一貫して上回る傾向、いわゆる「ワニの口」が明確に見て取れます。この構造的なギャップは、人口高齢化による支出増が経済成長を上回って進行していることを示しており、制度の持続可能性における核心的な課題です。</p>`,
+        benefits: `
+            <h3 class="font-bold mb-2">解説：給付の構造変化</h3>
+            <p>給付費の内訳を見ると、年金が最大の要素ですが、医療費と福祉・その他（主に介護）の伸びが著しいことがわかります。特に2000年の介護保険制度創設以降、「福祉・その他」が急増しました。これは支出増大が、高齢化に伴う医療・介護ニーズの増大によって強く駆動されていることを示しています。</p>`,
+        burdens: `
+            <h3 class="font-bold mb-2">解説：財源の構成</h3>
+            <p>社会保障の財源は、主に現役世代が納める「保険料」（紫）と、税金を原資とする「公費」（黄緑）で賄われています。増え続ける給付に対応するため、両方の負担が増加傾向にあります。コロナ禍の2020年度には経済対策として公費が急増しましたが、その後は落ち着いています。</p>`,
+        gdp: `
+            <h3 class="font-bold mb-2">解説：増大する経済的インパクト</h3>
+            <p>社会保障給付費が国民経済（GDP）に占める割合は、2000年度の14.2%から2022年度には24.3%へと大幅に上昇しました。これは国民経済の約4分の1が社会保障関連で動いていることを意味します。経済成長を上回るペースで社会保障費が増大していることが、国民負担率の上昇に直結しています。</p>`
+    };
+
+    let chartInstance = null;
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    const chartTitleEl = document.getElementById('chart-title');
+    const chartExplanationEl = document.getElementById('chart-explanation');
+    const buttons = {
+        total: document.getElementById('btn-total'),
+        benefits: document.getElementById('btn-benefits'),
+        burdens: document.getElementById('btn-burdens'),
+        gdp: document.getElementById('btn-gdp')
+    };
+
+    const yAxisTrillionYen = {
+        beginAtZero: true,
+        ticks: { callback: value => `${value}兆円` }
+    };
+
+    const yAxisPercent = {
+        beginAtZero: true,
+        ticks: { callback: value => `${value}%` }
+    };
+    
+    const baseChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: {
+                title: { display: true, text: '年度' },
+                grid: { display: false }
+            }
+        },
+        plugins: {
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: '#1f2937',
+                titleFont: { size: 14 },
+                bodyFont: { size: 12 },
+                padding: 10,
+                cornerRadius: 4
+            },
+            legend: {
+                position: 'top',
+            },
+        },
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+    };
+
+    function updateChart(view) {
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        let chartConfig;
+        switch(view) {
+            case 'total':
+                chartConfig = {
+                    type: 'line',
+                    data: {
+                        labels: reportData.years,
+                        datasets: [
+                            {
+                                label: '総給付費',
+                                data: reportData.benefits.total,
+                                borderColor: '#2563eb',
+                                backgroundColor: '#2563eb33',
+                                tension: 0.1,
+                                borderWidth: 2,
+                                fill: false,
+                            },
+                            {
+                                label: '総財源',
+                                data: reportData.burdens.total,
+                                borderColor: '#16a34a',
+                                backgroundColor: '#16a34a33',
+                                tension: 0.1,
+                                borderWidth: 2,
+                                fill: false,
+                            }
+                        ]
+                    },
+                    options: { ...baseChartOptions, scales: { ...baseChartOptions.scales, y: yAxisTrillionYen }, plugins: { ...baseChartOptions.plugins, tooltip: { ...baseChartOptions.plugins.tooltip, callbacks: { label: context => `${context.dataset.label}: ${context.parsed.y}兆円` } } } }
+                };
+                break;
+
+            case 'benefits':
+                chartConfig = {
+                    type: 'bar',
+                    data: {
+                        labels: reportData.years,
+                        datasets: [
+                            { label: '年金', data: reportData.benefits.pension, backgroundColor: '#3b82f6' },
+                            { label: '医療', data: reportData.benefits.medical, backgroundColor: '#14b8a6' },
+                            { label: '福祉・その他', data: reportData.benefits.welfare, backgroundColor: '#f97316' },
+                        ]
+                    },
+                    options: { ...baseChartOptions, scales: { x: { ...baseChartOptions.scales.x, stacked: true }, y: { ...yAxisTrillionYen, stacked: true } }, plugins: { ...baseChartOptions.plugins, tooltip: { ...baseChartOptions.plugins.tooltip, callbacks: { label: context => `${context.dataset.label}: ${context.parsed.y}兆円` } } } }
+                };
+                break;
+
+            case 'burdens':
+                chartConfig = {
+                    type: 'bar',
+                    data: {
+                        labels: reportData.years,
+                        datasets: [
+                            { label: '保険料', data: reportData.burdens.insurance, backgroundColor: '#8b5cf6' },
+                            { label: '公費（税）', data: reportData.burdens.public, backgroundColor: '#84cc16' },
+                            { label: 'その他収入', data: reportData.burdens.other, backgroundColor: '#6b7280' },
+                        ]
+                    },
+                    options: { ...baseChartOptions, scales: { x: { ...baseChartOptions.scales.x, stacked: true }, y: { ...yAxisTrillionYen, stacked: true } }, plugins: { ...baseChartOptions.plugins, tooltip: { ...baseChartOptions.plugins.tooltip, callbacks: { label: context => `${context.dataset.label}: ${context.parsed.y}兆円` } } } }
+                };
+                break;
+            
+            case 'gdp':
+                 chartConfig = {
+                    type: 'line',
+                    data: {
+                        labels: reportData.years,
+                        datasets: [
+                            {
+                                label: '総給付費/GDP',
+                                data: reportData.gdp.benefits_ratio,
+                                borderColor: '#ca8a04',
+                                backgroundColor: '#ca8a0433',
+                                fill: true,
+                            },
+                            {
+                                label: '保険料/GDP',
+                                data: reportData.gdp.insurance_ratio,
+                                borderColor: '#c026d3',
+                                backgroundColor: '#c026d333',
+                                hidden: true,
+                                fill: false,
+                            },
+                             {
+                                label: '公費/GDP',
+                                data: reportData.gdp.public_ratio,
+                                borderColor: '#059669',
+                                backgroundColor: '#05966933',
+                                hidden: true,
+                                fill: false,
+                            },
+                        ]
+                    },
+                    options: { ...baseChartOptions, scales: { ...baseChartOptions.scales, y: yAxisPercent }, plugins: { ...baseChartOptions.plugins, tooltip: { ...baseChartOptions.plugins.tooltip, callbacks: { label: context => `${context.dataset.label}: ${context.parsed.y}%` } } } }
+                };
+                break;
+        }
+
+        chartInstance = new Chart(ctx, chartConfig);
+        chartTitleEl.textContent = buttons[view].textContent;
+        chartExplanationEl.innerHTML = textData[view];
+        updateActiveButton(view);
+    }
+    
+    function updateActiveButton(activeView) {
+        Object.keys(buttons).forEach(view => {
+            if (view === activeView) {
+                buttons[view].classList.remove('inactive-btn');
+                buttons[view].classList.add('active-btn');
+            } else {
+                buttons[view].classList.remove('active-btn');
+                buttons[view].classList.add('inactive-btn');
+            }
+        });
+    }
+
+    Object.keys(buttons).forEach(view => {
+        buttons[view].addEventListener('click', () => updateChart(view));
+    });
+
+    window.onload = () => {
+        updateChart('total');
+    };
+
+</script>
+
+</body>
+</html>
